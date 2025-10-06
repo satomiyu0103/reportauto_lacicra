@@ -1,1 +1,1 @@
-# reportauto_lacicra
+# Web日報サイトらしくらに日報を自動記入する
