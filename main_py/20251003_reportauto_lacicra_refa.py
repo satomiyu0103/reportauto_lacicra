@@ -30,7 +30,7 @@ from modules.webui import (
 
 
 def main():
-    file_path = r"config\.env"
+    file_path = r".\config\.env"
     EXCEL_FILE_PATH, your_username, your_password = get_env_keys(file_path)
     ws = get_excel_data(EXCEL_FILE_PATH)
     report = get_today_report(ws)

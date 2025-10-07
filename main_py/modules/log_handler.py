@@ -9,7 +9,7 @@ from pathlib import Path
 import logging
 
 # ログの設定
-log_path = r"logs\error_log.txt"
+log_path = "logs/error_log.txt"
 # reportauto_lacicra\logs\error_log.txt
 
 logging.basicConfig(
