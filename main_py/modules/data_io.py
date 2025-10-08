@@ -3,6 +3,7 @@
 =========="""
 
 ## パスやIDの取得
+from pathlib import Path
 from dotenv import load_dotenv
 import os
 
@@ -14,11 +15,16 @@ import openpyxl
 from modules.log_handler import log_error
 
 
-def get_env_keys(file_path):
+def get_env_keys():
     # excelファイルの取得
     try:
-        # configフォルダ内にあるenvファイルの場所を指定する
-        load_dotenv(file_path)
+        PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+    except NameError:
+        PROJECT_ROOT = Path.cwd()
+    # configフォルダ内にあるenvファイルの場所を指定する
+    file_path = PROJECT_ROOT / "config" / ".env"
+    load_dotenv(file_path)
+    try:
         # ExcelパスとLacicraのusername/passwordを取得
         EXCEL_FILE_PATH = os.getenv("EXCEL_FILE_PATH")
         your_username = os.getenv("LACICRA_USERNAME")

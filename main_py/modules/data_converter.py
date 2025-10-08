@@ -40,12 +40,24 @@ def time_conv(report_dict):
 
 
 def data_conv(report_dict):
+    """体温・時刻データを整える
+
+    Args:
+        report_dict (_dict_): 日報データ
+
+    Returns:
+        _float/string_: それぞれ整えたデータ
+    """
     report_dict["体温"] = temp_conv(report_dict)
-    (
-        report_dict["開始予定時刻"],
-        report_dict["終了予定時刻"],
-        report_dict["開始時刻"],
-        report_dict["終了時刻"],
-        report_dict["就寝時刻"],
-        report_dict["起床時刻"],
-    ) = time_conv(report_dict)
+    keys = [
+        "開始予定時刻",
+        "終了予定時刻",
+        "開始時刻",
+        "終了時刻",
+        "就寝時刻",
+        "起床時刻",
+    ]
+    times = time_conv(report_dict)
+    for key, time_val in zip(keys, times):
+        report_dict[key] = time_val
+    return (report_dict["体温"], *[report_dict[k] for k in keys])

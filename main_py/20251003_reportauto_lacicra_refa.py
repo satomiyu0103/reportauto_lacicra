@@ -5,6 +5,7 @@
 # 必要なライブラリ・モジュールをインポート
 ## pathlib
 from pathlib import Path
+from dotenv import load_dotenv
 
 # データ取得
 from modules.data_io import (
@@ -30,15 +31,22 @@ from modules.webui import (
 
 
 def main():
-    file_path = r".\config\.env"
-    EXCEL_FILE_PATH, your_username, your_password = get_env_keys(file_path)
+    EXCEL_FILE_PATH, your_username, your_password = get_env_keys()
     ws = get_excel_data(EXCEL_FILE_PATH)
     report = get_today_report(ws)
     report_dict = unpack_report(report)
+    (
+        report_dict["体温"],
+        report_dict["開始予定時刻"],
+        report_dict["終了予定時刻"],
+        report_dict["開始時刻"],
+        report_dict["終了時刻"],
+        report_dict["就寝時刻"],
+        report_dict["起床時刻"],
+    ) = data_conv(report_dict)
     if report_dict["通所形態"] == "休日":
         pass
     else:
-        report_dict = data_conv(report_dict)
         LACICRA_URL = "https://lacicra.jp/login.php"
         driver, wait = open_lacicra(LACICRA_URL)
         login_lacicra(wait, your_username, your_password)
