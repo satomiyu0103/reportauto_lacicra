@@ -57,11 +57,13 @@ def open_lacicra(LACICRA_URL):
     ## Selenium実行後もChromeを開いたままにする
     options = Options()
     options.add_experimental_option("detach", True)
+    # 常に最新→"stable" ver固定→"141"
+    options.set_capability("browserVersion", "141")
 
     try:
-        service = Service(ChromeDriverManager().install())
+        # service = Service(ChromeDriverManager().install())
         ## Chromeを起動
-        driver = webdriver.Chrome(service=service, options=options)
+        driver = webdriver.Chrome(options=options)  # service=service,
         ## ラシクラのURLにアクセス
         driver.get(LACICRA_URL)
         ## 待機時間の設定
