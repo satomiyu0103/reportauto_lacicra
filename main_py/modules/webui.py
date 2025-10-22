@@ -58,7 +58,7 @@ def open_lacicra(LACICRA_URL):
     options = Options()
     options.add_experimental_option("detach", True)
     # 常に最新→"stable" ver固定→"141"
-    options.set_capability("browserVersion", "141")
+    options.set_capability("browserVersion", "stable")
 
     try:
         # service = Service(ChromeDriverManager().install())
