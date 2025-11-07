@@ -67,7 +67,7 @@ def open_lacicra(LACICRA_URL):
         ## ラシクラのURLにアクセス
         driver.get(LACICRA_URL)
         ## 待機時間の設定
-        wait = WebDriverWait(driver, 30)
+        wait = WebDriverWait(driver, 300)
         return driver, wait
     except Exception as e:
         log_error("ブラウザの起動またはURLアクセスに失敗しました: ", e)
