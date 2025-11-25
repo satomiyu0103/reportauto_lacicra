@@ -102,7 +102,8 @@ def today_report_click(wait, btn_id):
 
 
 def today_report_btn_click(wait):
-    TODAY_REPORT_BTN_ID = "button-1110-btnIconEl"
+    # button-1110-btnIconEl
+    TODAY_REPORT_BTN_ID = "button-1111-btnIconEl"
     handle_exceptions(
         lambda: today_report_click(wait, TODAY_REPORT_BTN_ID), TODAY_REPORT_BTN_ID
     )
@@ -121,11 +122,11 @@ def input_summary(wait, input_id, summary):
 # 今日の日報を入力する
 def input_today_summarys(wait, report_dict):
     # 通所について
-    TEMP_INPUT_ID = "textfield-1131-inputEl"
-    START_PLAN_INPUT_ID = "timefield-1135-inputEl"
-    END_PLAN_INPUT_ID = "timefield-1139-inputEl"
-    START_ACTUAL_INPUT_ID = "timefield-1144-inputEl"
-    END_ACTUAL_INPUT_ID = "timefield-1148-inputEl"
+    TEMP_INPUT_ID = "textfield-1132-inputEl"
+    START_PLAN_INPUT_ID = "timefield-1136-inputEl"
+    END_PLAN_INPUT_ID = "timefield-1140-inputEl"
+    START_ACTUAL_INPUT_ID = "timefield-1145-inputEl"
+    END_ACTUAL_INPUT_ID = "timefield-1149-inputEl"
 
     handle_exceptions(
         lambda: input_summary(wait, TEMP_INPUT_ID, report_dict["体温"]), TEMP_INPUT_ID
@@ -148,8 +149,8 @@ def input_today_summarys(wait, report_dict):
     )  # 退所時間を入力
 
     # 午前・午後の取組
-    AM_TASKS_INPUT_ID = "textarea-1155-inputEl"
-    PM_TASKS_INPUT_ID = "textarea-1159-inputEl"
+    AM_TASKS_INPUT_ID = "textarea-1156-inputEl"
+    PM_TASKS_INPUT_ID = "textarea-1160-inputEl"
 
     handle_exceptions(
         lambda: input_summary(wait, AM_TASKS_INPUT_ID, report_dict["午前業務"]),
@@ -161,16 +162,16 @@ def input_today_summarys(wait, report_dict):
     )  # 午後の取組を入力
 
     ## 日報を入力
-    DAILY_REPORT_INPUT_ID = "textarea-1171-inputEl"
+    DAILY_REPORT_INPUT_ID = "textarea-1172-inputEl"
     handle_exceptions(
         lambda: input_summary(wait, DAILY_REPORT_INPUT_ID, report_dict["日報"]),
         DAILY_REPORT_INPUT_ID,
     )  # 日報を入力
 
     ## 睡眠についてを入力
-    SLP_TIME_INPUT_ID = "timefield-1174-inputEl"
-    WK_TIME_INPUT_ID = "timefield-1179-inputEl"
-    SLP_MEMO_INPUT_ID = "textarea-1194-inputEl"
+    SLP_TIME_INPUT_ID = "timefield-1175-inputEl"
+    WK_TIME_INPUT_ID = "timefield-1180-inputEl"
+    SLP_MEMO_INPUT_ID = "textarea-1195-inputEl"
 
     handle_exceptions(
         lambda: input_summary(wait, SLP_TIME_INPUT_ID, report_dict["就寝時刻"]),
@@ -185,7 +186,7 @@ def input_today_summarys(wait, report_dict):
     )  # memoを入力
 
     # 備考を入力
-    REMARKS_INPUT_ID = "textarea-1212-inputEl"
+    REMARKS_INPUT_ID = "textarea-1213-inputEl"
     handle_exceptions(
         lambda: input_summary(wait, REMARKS_INPUT_ID, ""), REMARKS_INPUT_ID
     )  # 備考を入力
@@ -202,14 +203,14 @@ def slp_status_click(wait, slp_status, btn_ids):
 
 def today_slp_status_click(wait, report_dict):
     # 睡眠について選択
-    WAKE_FEEL_BTN_ID_1 = "radiofield-1183-inputEl"
-    WAKE_FEEL_BTN_ID_2 = "radiofield-1184-inputEl"
-    WAKE_FEEL_BTN_ID_3 = "radiofield-1185-inputEl"
-    WAKE_FEEL_BTN_ID_4 = "radiofield-1186-inputEl"
-    WAKE_MOT_BTN_ID_1 = "radiofield-1189-inputEl"
-    WAKE_MOT_BTN_ID_2 = "radiofield-1190-inputEl"
-    WAKE_MOT_BTN_ID_3 = "radiofield-1191-inputEl"
-    WAKE_MOT_BTN_ID_4 = "radiofield-1192-inputEl"
+    WAKE_FEEL_BTN_ID_1 = "radiofield-1184-inputEl"
+    WAKE_FEEL_BTN_ID_2 = "radiofield-1185-inputEl"
+    WAKE_FEEL_BTN_ID_3 = "radiofield-1186-inputEl"
+    WAKE_FEEL_BTN_ID_4 = "radiofield-1187-inputEl"
+    WAKE_MOT_BTN_ID_1 = "radiofield-1190-inputEl"
+    WAKE_MOT_BTN_ID_2 = "radiofield-1191-inputEl"
+    WAKE_MOT_BTN_ID_3 = "radiofield-1192-inputEl"
+    WAKE_MOT_BTN_ID_4 = "radiofield-1193-inputEl"
 
     wake_feel_btn_ids = {
         1: WAKE_FEEL_BTN_ID_1,
@@ -247,12 +248,12 @@ def meal_click(wait, meal, meal_btn_ids):
 
 def today_meal_click(wait, report_dict):
     # 食事について選択
-    LUNCH_BTN_ID_1 = "radiofield-1197-inputEl"
-    LUNCH_BTN_ID_2 = "radiofield-1198-inputEl"
-    DINNER_BTN_ID_1 = "radiofield-1201-inputEl"
-    DINNER_BTN_ID_2 = "radiofield-1202-inputEl"
-    BF_BTN_ID_1 = "radiofield-1205-inputEl"
-    BF_BTN_ID_2 = "radiofield-1206-inputEl"
+    LUNCH_BTN_ID_1 = "radiofield-1198-inputEl"
+    LUNCH_BTN_ID_2 = "radiofield-1199-inputEl"
+    DINNER_BTN_ID_1 = "radiofield-1202-inputEl"
+    DINNER_BTN_ID_2 = "radiofield-1203-inputEl"
+    BF_BTN_ID_1 = "radiofield-1206-inputEl"
+    BF_BTN_ID_2 = "radiofield-1207-inputEl"
 
     lunch_btn_ids = {1: LUNCH_BTN_ID_1, 2: LUNCH_BTN_ID_2}
 
