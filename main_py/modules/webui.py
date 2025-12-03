@@ -122,11 +122,22 @@ def input_summary(wait, input_id, summary):
 # 今日の日報を入力する
 def input_today_summarys(wait, report_dict):
     # 通所について
-    TEMP_INPUT_ID = "textfield-1132-inputEl"
-    START_PLAN_INPUT_ID = "timefield-1136-inputEl"
-    END_PLAN_INPUT_ID = "timefield-1140-inputEl"
-    START_ACTUAL_INPUT_ID = "timefield-1145-inputEl"
-    END_ACTUAL_INPUT_ID = "timefield-1149-inputEl"
+    TEMP_INPUT_ID = "textfield-1132-inputEl"  # 体温
+    START_PLAN_INPUT_ID = "timefield-1136-inputEl"  # 開始予定時間
+    END_PLAN_INPUT_ID = "timefield-1140-inputEl"  # 終了予定時間
+    START_ACTUAL_INPUT_ID = "timefield-1145-inputEl"  # 開始実績時間
+    END_ACTUAL_INPUT_ID = "timefield-1149-inputEl"  # 終了実績時間
+
+    AM_TASKS_INPUT_ID = "textarea-1156-inputEl"  # 午前予定
+    PM_TASKS_INPUT_ID = "textarea-1160-inputEl"  # 午後予定
+
+    DAILY_REPORT_INPUT_ID = "textarea-1172-inputEl"  # 日報
+
+    SLP_TIME_INPUT_ID = "timefield-1175-inputEl"  # 就寝時間
+    WK_TIME_INPUT_ID = "timefield-1180-inputEl"  # 起床時間
+    SLP_MEMO_INPUT_ID = "textarea-1195-inputEl"  # 睡眠メモ
+
+    REMARKS_INPUT_ID = "textarea-1213-inputEl"  # 備考
 
     handle_exceptions(
         lambda: input_summary(wait, TEMP_INPUT_ID, report_dict["体温"]), TEMP_INPUT_ID
@@ -149,9 +160,6 @@ def input_today_summarys(wait, report_dict):
     )  # 退所時間を入力
 
     # 午前・午後の取組
-    AM_TASKS_INPUT_ID = "textarea-1156-inputEl"
-    PM_TASKS_INPUT_ID = "textarea-1160-inputEl"
-
     handle_exceptions(
         lambda: input_summary(wait, AM_TASKS_INPUT_ID, report_dict["午前業務"]),
         AM_TASKS_INPUT_ID,
@@ -162,17 +170,12 @@ def input_today_summarys(wait, report_dict):
     )  # 午後の取組を入力
 
     ## 日報を入力
-    DAILY_REPORT_INPUT_ID = "textarea-1172-inputEl"
     handle_exceptions(
         lambda: input_summary(wait, DAILY_REPORT_INPUT_ID, report_dict["日報"]),
         DAILY_REPORT_INPUT_ID,
     )  # 日報を入力
 
     ## 睡眠についてを入力
-    SLP_TIME_INPUT_ID = "timefield-1175-inputEl"
-    WK_TIME_INPUT_ID = "timefield-1180-inputEl"
-    SLP_MEMO_INPUT_ID = "textarea-1195-inputEl"
-
     handle_exceptions(
         lambda: input_summary(wait, SLP_TIME_INPUT_ID, report_dict["就寝時刻"]),
         SLP_TIME_INPUT_ID,
@@ -186,7 +189,6 @@ def input_today_summarys(wait, report_dict):
     )  # memoを入力
 
     # 備考を入力
-    REMARKS_INPUT_ID = "textarea-1213-inputEl"
     handle_exceptions(
         lambda: input_summary(wait, REMARKS_INPUT_ID, ""), REMARKS_INPUT_ID
     )  # 備考を入力
