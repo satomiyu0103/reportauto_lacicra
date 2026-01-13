@@ -9,7 +9,7 @@ from datetime import datetime, timezone, timedelta  # 日付取得用
 from dotenv import load_dotenv
 
 # データ取得
-from modules.data_io import (
+from common.data_loader import (
     get_env_keys,
     load_data,
     find_today_row,

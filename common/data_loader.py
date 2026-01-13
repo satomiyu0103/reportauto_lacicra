@@ -2,10 +2,17 @@
 ■ データ取得
 =========="""
 
-## パスやIDの取得
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+
+# rootなど
+from config.settings import (
+    PROJECT_ROOT,
+    SPREADSHEET_NAME,
+    DATA_SAUCE,
+    KEY_FILE_NAME,
+    SPREADSHEET_NAME,
+    SHEET_NAME,
+)
 
 ## Excelの操作
 from datetime import datetime
@@ -20,44 +27,27 @@ from modules.data_converter import unpack_report
 import pandas as pd
 
 # log_handler.py
-from modules.log_handler import log_error
-
-# =============================================================================
-# [設定スイッチ]
-# "EXCEL" ： ローカルExcelファイルを使用
-# "GOOGLE"：Googleスプレッドシートを使用
-DATA_SAUCE = "GOOGLE"
-
-# [Google Sheets設定]
-KEY_FILE_NAME = "service_account.json"
-SPREADSHEET_NAME = "日報"
-SHEET_NAME = "日報DB"
-# =============================================================================
+from ..modules.log_handler import log_error
 
 
-def find_key_path(filename: str):
+def find_key_path(KEY_FILE_NAME: str):
     """Jsonキーファイルのパスをプロジェクト全体から探索して返します。
 
     Args:
         filename (_type:str_):
     """
     try:
-        PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-    except NameError:
-        PROJECT_ROOT = Path.cwd()
-
-    try:
         # 探索パスリスト
         search_paths = [
-            PROJECT_ROOT / filename,
-            PROJECT_ROOT / "config" / filename,
-            PROJECT_ROOT.parent / "config" / filename,
+            PROJECT_ROOT / KEY_FILE_NAME,
+            PROJECT_ROOT / "config" / KEY_FILE_NAME,
+            PROJECT_ROOT.parent / "config" / KEY_FILE_NAME,
         ]
 
         # Jsonキーのパスを探索リストをもとに探索し、見つかったらパスを文字列で返す
-        for path in search_paths:
-            if path.exists():
-                return str(path)
+        for search_path in search_paths:
+            if search_path.exists():
+                return str(search_path)
         return None
     except Exception:
         return None
@@ -191,66 +181,3 @@ def find_today_row(data_list, target_date):
     print("今日のデータが見つかりませんでした")
 
     return None
-
-
-""" ===============================
-
-======================= """
-
-
-def get_env_keys():
-    # excelファイルの取得
-    try:
-        PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-    except NameError:
-        PROJECT_ROOT = Path.cwd()
-    # configフォルダ内にあるenvファイルの場所を指定する
-    file_path = PROJECT_ROOT / "config" / ".env"
-    load_dotenv(file_path)
-    try:
-        # ExcelパスとLacicraのusername/passwordを取得
-        EXCEL_FILE_PATH = os.getenv("EXCEL_FILE_PATH")
-        your_username = os.getenv("LACICRA_USERNAME")
-        your_password = os.getenv("LACICRA_PASSWORD")
-
-        if not EXCEL_FILE_PATH:
-            raise ValueError("EXCEL_FILE_PATHが.envから読み込めません")
-        if not your_username or not your_password:
-            raise ValueError("ユーザ名/パスワードが.envにありません")
-        return EXCEL_FILE_PATH, your_username, your_password
-    except Exception as e:
-        log_error(".envファイル読み込みエラー：", e)
-        raise
-
-
-def get_excel_data(EXCEL_FILE_PATH):
-    try:
-        # Excelから記入するデータを取得
-        ## Excelファイルの読み込み
-        wb = openpyxl.load_workbook(EXCEL_FILE_PATH)
-        ws = wb["日報DB"]
-    except FileNotFoundError:
-        log_error("Excelファイルが見つかりません")
-        exit()
-    except KeyError:
-        log_error("指定されたシート『日報DB』が見つかりません")
-        exit()
-
-    return ws
-
-
-def get_today_report(ws):
-    ## 今日の日付を文字列で取得
-    today_str = datetime.now().strftime("%Y/%m/%d")
-
-    ## 今日の行を探す
-    report = None
-    for row_today in ws.iter_rows(min_row=2, values_only=True):
-        if row_today[0] and row_today[0].strftime("%Y/%m/%d") == today_str:
-            report = row_today
-            break
-    if report is None:
-        log_error("今日の日付のデータが存在しません")
-        exit()
-
-    return report
