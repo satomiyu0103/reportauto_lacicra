@@ -3,10 +3,18 @@
 """
 
 # 必要なライブラリ・モジュールをインポート
-## pathlib
-from pathlib import Path
-from datetime import datetime, timezone, timedelta  # 日付取得用
-from dotenv import load_dotenv
+# 日付取得用
+from datetime import datetime, timezone, timedelta
+
+# 定数の取得
+from config.settings import (
+    PROJECT_ROOT,
+    EXCEL_FILE_PATH,
+    SLACK_WEBHOOK_URL_TOME,
+    SLACK_WEBHOOK_URL_TOSTUFF,
+    your_username,
+    your_password,
+)
 
 # データ取得
 from common.data_loader import (
@@ -34,9 +42,6 @@ from modules.webui import (
 
 
 def main():
-    # 設定と環境変数の読み込み
-    EXCEL_FILE_PATH, your_username, your_password = get_env_keys()
-
     # データの読み込み（ExcelまたはGoogleシート）
     # data_io.py内のDATA_SAUCEに基づいて取得先が変更される
     data_list = load_data(EXCEL_FILE_PATH)
@@ -71,7 +76,7 @@ def main():
         pass
     else:
         LACICRA_URL = "https://lacicra.jp/login.php"
-        driver, wait = open_lacicra(LACICRA_URL)
+        _, wait = open_lacicra(LACICRA_URL)
         login_lacicra(wait, your_username, your_password)
 
         # 手動でログイン
