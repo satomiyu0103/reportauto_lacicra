@@ -42,18 +42,13 @@ def main():
     data_list = load_data(EXCEL_FILE_PATH)
 
     # 今日のデータ行を検索
-    ## JSTを定義
     JST = timezone(timedelta(hours=9), "JST")
-    ## JSTを指定して現在時刻を取得
     today = datetime.now(JST).date()
     print(f"📅 検索対象の日付(JST): {today}")  # 確認用ログ
 
     report = find_today_row(data_list, today)
 
-    # ws = get_excel_data(EXCEL_FILE_PATH)
-    # report = get_today_report(ws)
-
-    # データが見つからない場合は終了
+    # report内にデータが見つからない場合は終了
     if report is None:
         message = f"❌ {today} の日報データが見つかりませんでした。処理を終了します。"
         log_error(message)
