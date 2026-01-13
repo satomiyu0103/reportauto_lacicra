@@ -77,7 +77,7 @@ def load_data(file_path=None):
         print(
             f"☁️ [Data Load] Google Sheets ('{SPREADSHEET_NAME}') からデータを読み込みます..."
         )
-        return _load_from_gspread(file_path)
+        return _load_from_gspread()
     else:
         print(f"📂 [Data Load] Excel ('{file_path}') からデータを読み込みます...")
         return _load_from_excel(file_path)
@@ -127,7 +127,7 @@ def _load_from_gspread():
         return []
 
     # ヘッダを除外
-    rows = raw_data[1]
+    rows = raw_data[:]
 
     # excelとの互換性確保のための型変換処理
     # google sheetsはすべて文字列で買えるため、日付列などを日付型に変換する
@@ -138,13 +138,14 @@ def _load_from_gspread():
         new_row = list(row)
 
         # 1. 日付変換（0列目："yyyy/mm/dd" -> datetime object
-        date_str = new_row[0]
-        if date_str:
-            try:
-                # フォーマットは実際のデータに合わせて調整
-                new_row[0] = pd.to_datetime(date_str).to_pydatetime()
-            except:
-                pass  # 変換できなければそのまま
+        if len(new_row) > 0:
+            date_str = new_row[0]
+            if date_str:
+                try:
+                    # フォーマットは実際のデータに合わせて調整
+                    new_row[0] = pd.to_datetime(date_str).to_pydatetime()
+                except:
+                    pass  # 変換できなければそのまま
 
         # 2. 必要に応じて
 
@@ -190,6 +191,11 @@ def find_today_row(data_list, target_date):
     print("今日のデータが見つかりませんでした")
 
     return None
+
+
+""" ===============================
+
+======================= """
 
 
 def get_env_keys():
