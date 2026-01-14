@@ -24,8 +24,8 @@ LACICRA_PASSWORD = os.getenv("LACICRA_PASSWORD")
 # [設定スイッチ] "EXCEL" or "GOOGLE"
 # "EXCEL" ： ローカルExcelファイルを使用
 # "GOOGLE"：Googleスプレッドシートを使用
-DATA_SAURCE = "GOOGLE"
-# DATA_SAURCE = "EXCEL"
+DATA_SOURCE = "GOOGLE"
+# DATA_SOURCE = "EXCEL"
 
 # [Google Sheets設定]
 KEY_FILE_NAME = "service_account.json"

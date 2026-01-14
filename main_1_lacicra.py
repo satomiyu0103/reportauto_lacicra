@@ -45,7 +45,7 @@ def main():
         log_info("🚀 Lacicra処理を開始します")
 
         # データの読み込み（ExcelまたはGoogleシート）
-        # data_io.py内のDATA_SAURCEに基づいて取得先が変更される
+        # data_io.py内のDATA_SOURCEに基づいて取得先が変更される
         data_list = load_data(EXCEL_FILE_PATH)
         if not data_list:
             log_error("データが空です")
@@ -110,7 +110,7 @@ def main():
     except Exception as e:
         log_error("実行中に予期せぬエラーが発生しました", e)
         # error時はウィンドウを閉じずに確認
-        # sys.exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
