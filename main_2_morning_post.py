@@ -3,10 +3,11 @@
 """
 
 from datetime import date
-from config.settings import EXCEL_FILE_PATH
-from common.data_loader import load_data, find_today_row
+
 from common.data_converter import unpack_report
-from common.log_handler import log_info, log_error
+from common.data_loader import find_today_row, load_data
+from common.log_handler import log_error, log_info
+from config.settings import EXCEL_FILE_PATH
 from services.slack_service import send_report
 
 

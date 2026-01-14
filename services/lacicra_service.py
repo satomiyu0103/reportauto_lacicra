@@ -5,19 +5,19 @@
 # 必要なライブラリ・モジュールをインポート
 ## LACICRAの操作
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import (
-    TimeoutException,
     ElementClickInterceptedException,
     ElementNotInteractableException,
-    StaleElementReferenceException,
-    NoSuchElementException,
-    WebDriverException,
     InvalidSessionIdException,
+    NoSuchElementException,
+    StaleElementReferenceException,
+    TimeoutException,
+    WebDriverException,
 )
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from common.log_handler import log_error
 

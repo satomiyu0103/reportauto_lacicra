@@ -6,42 +6,41 @@
 import sys
 
 # 日付取得用
-from datetime import datetime, timezone, timedelta
-
-# 定数の取得
-from config.settings import (
-    EXCEL_FILE_PATH,
-    LACICRA_USERNAME,
-    LACICRA_PASSWORD,
-)
-
-# データ取得
-from common.data_loader import (
-    load_data,
-    find_today_row,
-)
+from datetime import datetime, timedelta, timezone
 
 # データ変換
 from common.data_converter import data_conv, unpack_report
 
+# データ取得
+from common.data_loader import (
+    find_today_row,
+    load_data,
+)
+
 # logerror
 from common.log_handler import log_error, log_info
 
+# 定数の取得
+from config.settings import (
+    EXCEL_FILE_PATH,
+    LACICRA_PASSWORD,
+    LACICRA_USERNAME,
+)
+
 # Lacicra操作
 from services.lacicra_service import (
-    open_lacicra,
-    login_lacicra,
-    today_report_btn_click,
     input_today_summarys,
-    today_slp_status_click,
-    today_meal_click,
+    login_lacicra,
+    open_lacicra,
     save_button_click,
+    today_meal_click,
+    today_report_btn_click,
+    today_slp_status_click,
 )
 
 
 def main():
     try:
-
         log_info("🚀 Lacicra処理を開始します")
 
         # データの読み込み（ExcelまたはGoogleシート）

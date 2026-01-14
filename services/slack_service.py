@@ -2,10 +2,12 @@
 ■ Slack通知サービス (Integrated)
 =========="""
 
-import requests
 import json
+
+import requests
+
+from common.log_handler import log_error, log_info
 from config.settings import SLACK_WEBHOOK_URL_TOME, SLACK_WEBHOOK_URL_TOSTUFF
-from common.log_handler import log_info, log_error
 
 
 def _send_slack(message, webhook_url):
