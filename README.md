@@ -76,3 +76,38 @@ reportauto_lacicra/
 ├── main_2_..._post.py     # Slack通知用サブスクリプト
 ├── pyproject.toml      # 依存関係定義 (uv)
 └── uv.lock             # ロックファイル
+
+## 🛡️ 開発ガイド (Development)
+
+このプロジェクトでは、コード品質の維持に [Ruff](https://docs.astral.sh/ruff/) を使用しています。
+コミットする前に、以下のコマンドでコードのチェックと整形を行ってください。
+
+### リンター (Lint) & フォーマッター (Format)
+すべて `uv run` を通して実行します。
+
+#### 1. コードの静的解析 (Check)
+バグやコードスタイルの違反がないかチェックします。
+uv run ruff check
+
+#### 2. 自動修正 (Auto-fix)
+検出されたエラー（未使用のimportや変数の削除など）を自動で修正します。
+uv run ruff check --fix
+
+#### 3. コード整形 (Format)
+インデントや改行位置を統一します（Black互換）。
+uv run ruff format .
+
+### 💡 VS Code 推奨設定
+VS Code拡張機能 Ruff をインストールすると、ファイル保存時に自動で整形と修正が行われ、開発効率が向上します。
+
+.vscode/settings.json (ワークスペース設定) の例:
+{
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  }
+}
