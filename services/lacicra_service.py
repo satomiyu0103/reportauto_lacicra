@@ -6,10 +6,7 @@
 ## LACICRAの操作
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import (
@@ -22,7 +19,7 @@ from selenium.common.exceptions import (
     InvalidSessionIdException,
 )
 
-from common.log_handler import log_error, log_info
+from common.log_handler import log_error
 
 
 def handle_exceptions(action, element_id):
@@ -42,7 +39,7 @@ def handle_exceptions(action, element_id):
         log_error(f"[警告] '{element_id}'が古くなっています。IDを確認してください")
     except InvalidSessionIdException as e:
         print(
-            f"[エラー]ブラウザセッションが終了しました。'{element_id}'の操作はスキップされます"
+            f"[エラー]ブラウザセッションが終了しました。'{element_id}'の操作はスキップされます： {e}"
         )
     except WebDriverException as e:
         log_error(

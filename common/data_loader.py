@@ -20,11 +20,6 @@ from config.settings import (
     SHEET_NAME,
 )
 
-from common.data_converter import unpack_report
-
-# log_handler.py
-from common.log_handler import log_error
-
 
 def find_key_path(KEY_FILE_NAME: str):
     """Jsonキーファイルのパスをプロジェクト全体から探索して返します。
@@ -123,7 +118,7 @@ def _load_from_gspread():
             try:
                 # フォーマットは実際のデータに合わせて調整
                 new_row[0] = pd.to_datetime(new_row[0]).to_pydatetime()
-            except:
+            except Exception:
                 pass  # 変換できなければそのまま
 
         # 2. 必要に応じて
@@ -159,7 +154,7 @@ def find_today_row(data_list, target_date):
         elif isinstance(row_date, str):
             try:
                 row_date = pd.to_datetime(row_date).date()
-            except:
+            except Exception:
                 continue
 
         if row_date == target_date:
