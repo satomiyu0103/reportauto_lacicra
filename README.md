@@ -23,19 +23,18 @@ cd reportauto_lacicra
 
 ### 2. uv のインストールと依存関係の同期
 Python環境とライブラリを一括で構築します。
-
 - uv が未インストールの場合
-pip install uv
+-- pip install uv
 - 仮想環境の作成とライブラリのインストール
-uv sync
+-- uv sync
 
 
 ### 3. 環境変数の設定 (.env)
 .env.template をコピーして .env ファイルを作成し、必要な情報を入力してください。
 - Mac/Linux
-cp config/.env.template .env
+-- cp config/.env.template .env
 - Windows (PowerShell)
-Copy-Item config/.env.template .env
+-- Copy-Item config/.env.template .env
 
 #### 設定項目:
 - LACICRA_ID, LACICRA_PASS: Lacicraのログイン情報
@@ -61,9 +60,9 @@ uv run main_1_lacicra.py
 
 ### Slack通知のみ (手動トリガー)
 - 朝の挨拶
-uv run main_2_morning_post.py
+-- uv run main_2_morning_post.py
 - 夕方の日報通知
-uv run main_2_evening_post.py
+-- uv run main_2_evening_post.py
 
 
 ## 📂 ディレクトリ構成
