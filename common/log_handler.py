@@ -62,7 +62,12 @@ _setup_logger()
 
 
 def log_error(message, exception=None):
+    """エラーの際にerror.logに記録する
 
+    Args:
+        message (str): error内容を明記する
+        exception (_type_, optional): エラーメッセージ. Defaults to None.
+    """
     if exception:
         logging.error(f"{message}: {exception}")
     else:
