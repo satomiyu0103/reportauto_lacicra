@@ -1,0 +1,36 @@
+name: CI
+
+# トリガー: プルリクエスト作成時 と masterへのプッシュ時
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. コードをチェックアウト
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. uv をインストール (高速なセットアップ)
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      # 3. Python環境のセットアップ
+      - name: Set up Python
+        run: uv python install
+
+      # 4. 依存関係のインストール (ruff含む)
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      # 5. Ruffによるチェック (エラーがあればここで止まる)
+      - name: Run Ruff Check
+        run: uv run ruff check .
+
+      # 6. フォーマット確認 (整形されていないコードがあればエラーにする)
+      - name: Run Ruff Format Check
+        run: uv run ruff format --check .
