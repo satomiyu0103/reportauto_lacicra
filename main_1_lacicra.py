@@ -105,7 +105,7 @@ def main():
     except Exception as e:
         log_error("実行中に予期せぬエラーが発生しました", e)
         # error時はウィンドウを閉じずに確認
-        sys.exit(1)
+        # sys.exit(1)
 
 
 if __name__ == "__main__":
