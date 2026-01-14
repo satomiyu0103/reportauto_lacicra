@@ -22,7 +22,7 @@ from selenium.common.exceptions import (
     InvalidSessionIdException,
 )
 
-from modules.log_handler import log_error
+from common.log_handler import log_error, log_info
 
 
 def handle_exceptions(action, element_id):
@@ -195,9 +195,15 @@ def input_today_summarys(wait, report_dict):
 
 
 def slp_status_click(wait, slp_status, btn_ids):
+    try:
+        slp_status = int(slp_status)
+    except (ValueError, TypeError):
+        log_error(f"睡眠ステータスの値が不正です : {slp_status}")
+
     if slp_status not in [1, 2, 3, 4]:
-        log_error(f"{slp_status}が正しく入力されていません")
+        log_error(f"{slp_status}が範囲外です。1を設定します")
         slp_status = 1
+
     btn_id = btn_ids.get(slp_status)
     slp_btn_id = wait.until(EC.element_to_be_clickable((By.ID, btn_id)))
     slp_btn_id.click()
@@ -240,8 +246,14 @@ def today_slp_status_click(wait, report_dict):
 
 
 def meal_click(wait, meal, meal_btn_ids):
+    try:
+        meal = int(meal)
+    except (ValueError, TypeError):
+        log_error(f"食事の値が不正です: {meal}")
+        meal = 1
+
     if meal not in [1, 2]:
-        log_error(f"{meal}が正しく入力されていません")
+        log_error(f"{meal}が範囲外です。1を設定します")
         meal = 1
     btn_id = meal_btn_ids.get(meal)
     meal_btn_id = wait.until(EC.element_to_be_clickable((By.ID, btn_id)))

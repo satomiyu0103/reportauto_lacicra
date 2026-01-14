@@ -2,62 +2,47 @@
 ■ データ取得
 =========="""
 
-## パスやIDの取得
-from pathlib import Path
-from dotenv import load_dotenv
 import os
-
-## Excelの操作
-from datetime import datetime
+import pandas as pd
 import openpyxl
+from datetime import datetime
 
 ## gspreadの操作
 import gspread
 from google.oauth2.service_account import Credentials
-from modules.data_converter import unpack_report
 
-# 数値の操作
-import pandas as pd
+# rootなど
+from config.settings import (
+    PROJECT_ROOT,
+    DATA_SAURCE,
+    KEY_FILE_NAME,
+    SPREADSHEET_NAME,
+    SHEET_NAME,
+)
+
+from common.data_converter import unpack_report
 
 # log_handler.py
-from modules.log_handler import log_error
-
-# =============================================================================
-# [設定スイッチ]
-# "EXCEL" ： ローカルExcelファイルを使用
-# "GOOGLE"：Googleスプレッドシートを使用
-DATA_SAUCE = "GOOGLE"
-
-# [Google Sheets設定]
-KEY_FILE_NAME = "service_account.json"
-SPREADSHEET_NAME = "日報"
-SHEET_NAME = "日報DB"
-# =============================================================================
+from common.log_handler import log_error
 
 
-def find_key_path(filename: str):
+def find_key_path(KEY_FILE_NAME: str):
     """Jsonキーファイルのパスをプロジェクト全体から探索して返します。
 
     Args:
         filename (_type:str_):
     """
     try:
-        PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-    except NameError:
-        PROJECT_ROOT = Path.cwd()
-
-    try:
         # 探索パスリスト
         search_paths = [
-            PROJECT_ROOT / filename,
-            PROJECT_ROOT / "config" / filename,
-            PROJECT_ROOT.parent / "config" / filename,
+            PROJECT_ROOT / "config" / KEY_FILE_NAME,
+            PROJECT_ROOT / KEY_FILE_NAME,
         ]
 
         # Jsonキーのパスを探索リストをもとに探索し、見つかったらパスを文字列で返す
-        for path in search_paths:
-            if path.exists():
-                return str(path)
+        for search_path in search_paths:
+            if search_path.exists():
+                return str(search_path)
         return None
     except Exception:
         return None
@@ -73,7 +58,7 @@ def load_data(file_path=None):
         List: 行データのリスト（ヘッダを除くん次元配列
         ※Googleシートの場合もExcel互換の形式（日付obj）に変換して返す
     """
-    if DATA_SAUCE == "GOOGLE":
+    if DATA_SAURCE == "GOOGLE":
         print(
             f"☁️ [Data Load] Google Sheets ('{SPREADSHEET_NAME}') からデータを読み込みます..."
         )
@@ -89,10 +74,7 @@ def _load_from_excel(file_path):
         raise FileNotFoundError(f"Excelファイルが見つかりません： {file_path}")
 
     wb = openpyxl.load_workbook(file_path, data_only=True)
-    if SHEET_NAME in wb.sheetnames:
-        ws = wb[SHEET_NAME]
-    else:
-        ws = wb.worksheets[0]
+    ws = wb[SHEET_NAME] if SHEET_NAME in wb.sheetnames else wb.worksheets[0]
 
     # values_only=true で値のリストとして取得（ヘッダを除く二行目から）
     data = list(ws.iter_rows(min_row=2, values_only=True))
@@ -127,25 +109,22 @@ def _load_from_gspread():
         return []
 
     # ヘッダを除外
-    rows = raw_data[:]
+    rows = raw_data[1:]
 
     # excelとの互換性確保のための型変換処理
     # google sheetsはすべて文字列で買えるため、日付列などを日付型に変換する
     converted_rows = []
     # 取得したデータを1行ずつ日付変換する
     for row in rows:
-        # リストを編集可能なようにコピー
         new_row = list(row)
 
         # 1. 日付変換（0列目："yyyy/mm/dd" -> datetime object
-        if len(new_row) > 0:
-            date_str = new_row[0]
-            if date_str:
-                try:
-                    # フォーマットは実際のデータに合わせて調整
-                    new_row[0] = pd.to_datetime(date_str).to_pydatetime()
-                except:
-                    pass  # 変換できなければそのまま
+        if len(new_row) > 0 and new_row[0]:
+            try:
+                # フォーマットは実際のデータに合わせて調整
+                new_row[0] = pd.to_datetime(new_row[0]).to_pydatetime()
+            except:
+                pass  # 変換できなければそのまま
 
         # 2. 必要に応じて
 
@@ -172,13 +151,12 @@ def find_today_row(data_list, target_date):
             continue
 
         row_date = row[0]
-
         # row_dateがdatetimeオブジェクトの場合、date型に変換して比較
         if isinstance(row_date, datetime):
             row_date = row_date.date()
 
         # 文字列のままの場合の救済措置
-        if isinstance(row_date, str):
+        elif isinstance(row_date, str):
             try:
                 row_date = pd.to_datetime(row_date).date()
             except:
@@ -191,66 +169,3 @@ def find_today_row(data_list, target_date):
     print("今日のデータが見つかりませんでした")
 
     return None
-
-
-""" ===============================
-
-======================= """
-
-
-def get_env_keys():
-    # excelファイルの取得
-    try:
-        PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-    except NameError:
-        PROJECT_ROOT = Path.cwd()
-    # configフォルダ内にあるenvファイルの場所を指定する
-    file_path = PROJECT_ROOT / "config" / ".env"
-    load_dotenv(file_path)
-    try:
-        # ExcelパスとLacicraのusername/passwordを取得
-        EXCEL_FILE_PATH = os.getenv("EXCEL_FILE_PATH")
-        your_username = os.getenv("LACICRA_USERNAME")
-        your_password = os.getenv("LACICRA_PASSWORD")
-
-        if not EXCEL_FILE_PATH:
-            raise ValueError("EXCEL_FILE_PATHが.envから読み込めません")
-        if not your_username or not your_password:
-            raise ValueError("ユーザ名/パスワードが.envにありません")
-        return EXCEL_FILE_PATH, your_username, your_password
-    except Exception as e:
-        log_error(".envファイル読み込みエラー：", e)
-        raise
-
-
-def get_excel_data(EXCEL_FILE_PATH):
-    try:
-        # Excelから記入するデータを取得
-        ## Excelファイルの読み込み
-        wb = openpyxl.load_workbook(EXCEL_FILE_PATH)
-        ws = wb["日報DB"]
-    except FileNotFoundError:
-        log_error("Excelファイルが見つかりません")
-        exit()
-    except KeyError:
-        log_error("指定されたシート『日報DB』が見つかりません")
-        exit()
-
-    return ws
-
-
-def get_today_report(ws):
-    ## 今日の日付を文字列で取得
-    today_str = datetime.now().strftime("%Y/%m/%d")
-
-    ## 今日の行を探す
-    report = None
-    for row_today in ws.iter_rows(min_row=2, values_only=True):
-        if row_today[0] and row_today[0].strftime("%Y/%m/%d") == today_str:
-            report = row_today
-            break
-    if report is None:
-        log_error("今日の日付のデータが存在しません")
-        exit()
-
-    return report
