@@ -48,7 +48,7 @@ def unpack_report(report):
 def temp_conv(report_dict):
     ## 体温を小数点以下まで表示
     try:
-        val = report_dict.get["体温"]
+        val = report_dict.get("体温")
         if not val:
             return ""
         else:
@@ -56,6 +56,32 @@ def temp_conv(report_dict):
     except (ValueError, TypeError) as e:
         log_error("体温の値が正しくありません", e)
         return "99.9"  # エラー時の代替値
+
+
+def str_to_num(report_dict):
+    """データを数値型に変換する
+
+    Args:
+        report_dict (_type_): _description_
+    """
+    numbers_keys = [
+        "寝起き",
+        "起床時のやる気",
+        "昼食",
+        "夕食",
+        "朝食",
+    ]
+
+    to_num_keys = []
+    for n in numbers_keys:
+        val = report_dict.get(n)
+        if not val or None:
+            return
+        else:
+            t = int(val)
+            to_num_keys.append(t)
+
+    return to_num_keys
 
 
 def time_conv(report_dict):
@@ -95,6 +121,18 @@ def data_conv(report_dict):
         _float/string_: それぞれ整えたデータ
     """
     report_dict["体温"] = temp_conv(report_dict)
+
+    numbers_keys = [
+        "寝起き",
+        "起床時のやる気",
+        "昼食",
+        "夕食",
+        "朝食",
+    ]
+    numebers = str_to_num(report_dict)
+    for num_key, num_val in zip(numbers_keys, numebers):
+        report_dict[num_key] = num_val
+
     time_keys = [
         "開始予定時刻",
         "終了予定時刻",
@@ -107,4 +145,8 @@ def data_conv(report_dict):
     for key, time_val in zip(time_keys, times):
         report_dict[key] = time_val
 
-    return (report_dict["体温"], *[report_dict[k] for k in time_keys])
+    return (
+        report_dict["体温"],
+        *[report_dict[k] for k in time_keys],
+        *[report_dict[n] for n in numbers_keys],
+    )

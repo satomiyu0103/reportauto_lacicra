@@ -4,6 +4,7 @@
 
 ## logの記入
 import logging
+import logging.handlers
 import sys
 
 # rootなど
@@ -24,13 +25,27 @@ def _setup_logger():
     # ハンドラが重複しないようにチェック
     if not logger.handlers:
         # 1. Info用ファイルハンドラ
-        info_handler = logging.FileHandler(LOG_DIR / "app_info.log", encoding="utf-8")
+        info_log_path = LOG_DIR / "app_info.log"
+        info_handler = logging.handlers.TimedRotatingFileHandler(
+            filename=info_log_path,
+            when="D",
+            interval=1,
+            backupCount=30,
+            encoding="utf-8",
+        )
         info_handler.setLevel(logging.INFO)
         info_handler.setFormatter(formatter)
         logger.addHandler(info_handler)
 
         # 2. Error用ファイルハンドラ
-        error_handler = logging.FileHandler(LOG_DIR / "error_log.log", encoding="utf-8")
+        error_log_path = LOG_DIR / "error_log.log"
+        error_handler = logging.handlers.TimedRotatingFileHandler(
+            filename=error_log_path,
+            when="D",
+            interval=1,
+            backupCount=30,
+            encoding="utf-8",
+        )
         error_handler.setLevel(logging.ERROR)
         error_handler.setFormatter(formatter)
         logger.addHandler(error_handler)

@@ -76,6 +76,11 @@ def main():
             report_dict["終了時刻"],
             report_dict["就寝時刻"],
             report_dict["起床時刻"],
+            report_dict["寝起き"],
+            report_dict["起床時のやる気"],
+            report_dict["昼食"],
+            report_dict["夕食"],
+            report_dict["朝食"],
         ) = data_conv(report_dict)
 
         # Web操作
