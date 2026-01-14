@@ -13,7 +13,7 @@ from config.settings import (
 )
 
 
-# ログ設定の初期化（井地度だけ行う
+# ログ設定の初期化（一度だけ行う
 # info.log: 通常の実行ログ / error.log: エラーログ
 def _setup_logger():
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")

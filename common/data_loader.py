@@ -14,7 +14,7 @@ from google.oauth2.service_account import Credentials
 # rootなど
 from config.settings import (
     PROJECT_ROOT,
-    DATA_SAURCE,
+    DATA_SOURCE,
     KEY_FILE_NAME,
     SPREADSHEET_NAME,
     SHEET_NAME,
@@ -58,7 +58,7 @@ def load_data(file_path=None):
         List: 行データのリスト（ヘッダを除くん次元配列
         ※Googleシートの場合もExcel互換の形式（日付obj）に変換して返す
     """
-    if DATA_SAURCE == "GOOGLE":
+    if DATA_SOURCE == "GOOGLE":
         print(
             f"☁️ [Data Load] Google Sheets ('{SPREADSHEET_NAME}') からデータを読み込みます..."
         )
