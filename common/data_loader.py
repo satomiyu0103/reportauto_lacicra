@@ -3,21 +3,23 @@
 =========="""
 
 import os
-import pandas as pd
-import openpyxl
 from datetime import datetime
 
 ## gspreadの操作
 import gspread
+import openpyxl
+import pandas as pd
 from google.oauth2.service_account import Credentials
+
+from common.log_handler import log_error, log_info
 
 # rootなど
 from config.settings import (
-    PROJECT_ROOT,
     DATA_SOURCE,
     KEY_FILE_NAME,
-    SPREADSHEET_NAME,
+    PROJECT_ROOT,
     SHEET_NAME,
+    SPREADSHEET_NAME,
 )
 
 
@@ -54,12 +56,12 @@ def load_data(file_path=None):
         ※Googleシートの場合もExcel互換の形式（日付obj）に変換して返す
     """
     if DATA_SOURCE == "GOOGLE":
-        print(
+        log_info(
             f"☁️ [Data Load] Google Sheets ('{SPREADSHEET_NAME}') からデータを読み込みます..."
         )
         return _load_from_gspread()
     else:
-        print(f"📂 [Data Load] Excel ('{file_path}') からデータを読み込みます...")
+        log_info(f"📂 [Data Load] Excel ('{file_path}') からデータを読み込みます...")
         return _load_from_excel(file_path)
 
 
@@ -138,7 +140,7 @@ def find_today_row(data_list, target_date):
     Returns:
         list or tuple: 見つかった行データ。なければNone
     """
-    print(f"🔍 [Search] {target_date} のデータを探しています...")
+    log_info(f"🔍 [Search] {target_date} のデータを探しています...")
 
     for row in data_list:
         # Excel/Googleシートの空行対策
@@ -158,9 +160,9 @@ def find_today_row(data_list, target_date):
                 continue
 
         if row_date == target_date:
-            print("データが見つかりました")
+            log_info("データが見つかりました")
             return row
 
-    print("今日のデータが見つかりませんでした")
+    log_error("今日のデータが見つかりませんでした")
 
     return None

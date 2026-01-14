@@ -86,5 +86,5 @@ def send_report(data, report_type="morning", to_staff=False):
     # 送信先切り替え
     target_url = SLACK_WEBHOOK_URL_TOSTUFF if to_staff else SLACK_WEBHOOK_URL_TOME
 
-    print(f"📨 [Slack] 送信中... ({'スタッフ宛' if to_staff else '自分宛'})")
+    log_info(f"📨 [Slack] 送信中... ({'スタッフ宛' if to_staff else '自分宛'})")
     _send_slack(msg, target_url)

@@ -38,7 +38,7 @@ def handle_exceptions(action, element_id):
     except StaleElementReferenceException:
         log_error(f"[警告] '{element_id}'が古くなっています。IDを確認してください")
     except InvalidSessionIdException as e:
-        print(
+        log_error(
             f"[エラー]ブラウザセッションが終了しました。'{element_id}'の操作はスキップされます： {e}"
         )
     except WebDriverException as e:
