@@ -85,26 +85,29 @@ def main():
         # Web操作
         if report_dict["通所形態"] == "休日":
             log_info("本日はお休みです")
-            pass
-        else:
-            LACICRA_URL = "https://lacicra.jp/login.php"
-            _, wait = open_lacicra(LACICRA_URL)
-            login_lacicra(
-                wait,
-                LACICRA_USERNAME,
-                LACICRA_PASSWORD,
-            )
+            return
+        elif report_dict["通所形態"] != "在宅":
+            log_info("特殊な利用日です")
+            return
 
-            # 手動でログイン
-            log_info("⌛ ログイン作業中")
+        LACICRA_URL = "https://lacicra.jp/login.php"
+        _, wait = open_lacicra(LACICRA_URL)
+        login_lacicra(
+            wait,
+            LACICRA_USERNAME,
+            LACICRA_PASSWORD,
+        )
 
-            today_report_btn_click(wait)
-            input_today_summarys(wait, report_dict)
-            today_slp_status_click(wait, report_dict)
-            today_meal_click(wait, report_dict)
-            save_button_click(wait)
+        # 手動でログイン
+        log_info("⌛ ログイン作業中")
 
-            log_info("✅ Lacicra処理が正常終了しました")
+        today_report_btn_click(wait)
+        input_today_summarys(wait, report_dict)
+        today_slp_status_click(wait, report_dict)
+        today_meal_click(wait, report_dict)
+        save_button_click(wait)
+
+        log_info("✅ Lacicra処理が正常終了しました")
 
     except Exception as e:
         log_error("実行中に予期せぬエラーが発生しました", e)
