@@ -39,12 +39,14 @@ def handle_exceptions(action, element_id):
         log_error(f"[警告] '{element_id}'が古くなっています。IDを確認してください")
     except InvalidSessionIdException as e:
         log_error(
-            f"[エラー]ブラウザセッションが終了しました。'{element_id}'の操作はスキップされます： {e}"
+            f"[致命]ブラウザセッションが終了しました。処理を中断します。'{element_id}'の操作はスキップされます： {e}"
         )
+        raise  # エラーを呼び出し元に通知してストップ
     except WebDriverException as e:
         log_error(
-            f"WebDriverのエラーが発生しました。「・・・」>「ヘルプ」>「Google Chromeについて」からChromeのバージョンが最新か確認してください： {e}"
+            f"[致命] WebDriverのエラーが発生しました。処理を中断します。「・・・」>「ヘルプ」>「Google Chromeについて」からChromeのバージョンが最新か確認してください： {e}"
         )
+        raise
     except Exception as e:
         log_error(f"[予期せぬエラー] '{element_id}'の処理中に問題が発生しました: {e}")
 
