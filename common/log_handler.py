@@ -37,6 +37,12 @@ def _setup_logger():
         info_handler.setFormatter(formatter)
         logger.addHandler(info_handler)
 
+        # 【追加】ERROR以上のログを除外するフィルタを追加
+        # levelnoがERROR(40)より小さい場合のみTrueを返す
+        info_handler.addFilter(lambda record: record.levelno < logging.ERROR)
+
+        logger.addHandler(info_handler)
+
         # 2. Error用ファイルハンドラ
         error_log_path = LOG_DIR / "error_log.log"
         error_handler = logging.handlers.TimedRotatingFileHandler(

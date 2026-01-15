@@ -40,8 +40,10 @@ def find_key_path(KEY_FILE_NAME: str):
         for search_path in search_paths:
             if search_path.exists():
                 return str(search_path)
+        log_error(f"キーファイル{KEY_FILE_NAME}が見つかりませんでした")
         return None
     except Exception:
+        log_error("キーファイル探索中にエラーが発生しました")
         return None
 
 
