@@ -96,7 +96,7 @@ def main():
             )
 
             # 手動でログイン
-            log_info("✅ ログイン作業中")
+            log_info("⌛ ログイン作業中")
 
             today_report_btn_click(wait)
             input_today_summarys(wait, report_dict)
