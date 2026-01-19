@@ -44,7 +44,7 @@ def _setup_logger():
         logger.addHandler(info_handler)
 
         # 2. Error用ファイルハンドラ
-        error_log_path = LOG_DIR / "error_log.log"
+        error_log_path = LOG_DIR / "error_info.log"
         error_handler = logging.handlers.TimedRotatingFileHandler(
             filename=error_log_path,
             when="D",
