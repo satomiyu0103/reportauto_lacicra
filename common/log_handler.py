@@ -5,12 +5,16 @@
 ## logの記入
 import logging
 import logging.handlers
+import os
+import shutil
 import sys
 
 # rootなど
 from config.settings import (
     LOG_DIR,
 )
+
+ARCHIVE_DIR_NAME = "logs_archives"
 
 
 # ログ設定の初期化（一度だけ行う
@@ -21,6 +25,34 @@ def _setup_logger():
     # ルートロガーの設定
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
+
+    # アーカイブ用ディレクトリのパス定義と作成
+    archive_dir = LOG_DIR / ARCHIVE_DIR_NAME
+    if not os.path.exists(archive_dir):
+        os.makedirs(archive_dir)
+
+    def custom_namer(default_name):
+        """命名規則の変更
+
+        Args:
+            default_name (_str_): _description_
+
+        Returns:
+            _str_: _description_
+        """
+        return str(archive_dir / os.path.basename(default_name))
+
+    def custom_rotator(source, dest):
+        """移動処理の変更
+        ソースファイルをnamerで決めたパスへ移動する
+        Args:
+            source (_str_): _description_
+            dest (_str_): _description_
+        """
+        if os.path.exists(source, dest):
+            if os.path.exists(dest):
+                os.remove(dest)
+            shutil.move(source, dest)
 
     # ハンドラが重複しないようにチェック
     if not logger.handlers:
@@ -33,9 +65,11 @@ def _setup_logger():
             backupCount=30,
             encoding="utf-8",
         )
+        info_handler.namer = custom_namer
+        info_handler.rotator = custom_rotator
+
         info_handler.setLevel(logging.INFO)
         info_handler.setFormatter(formatter)
-        logger.addHandler(info_handler)
 
         # 【追加】ERROR以上のログを除外するフィルタを追加
         # levelnoがERROR(40)より小さい場合のみTrueを返す
@@ -52,6 +86,10 @@ def _setup_logger():
             backupCount=30,
             encoding="utf-8",
         )
+
+        error_handler.namer = custom_namer
+        error_handler.rotator = custom_rotator
+
         error_handler.setLevel(logging.ERROR)
         error_handler.setFormatter(formatter)
         logger.addHandler(error_handler)
