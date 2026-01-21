@@ -2,6 +2,7 @@
 ■ 夕方の業務報告 (Slack通知)
 """
 
+import logging
 from datetime import date
 
 from common.data_converter import unpack_report
@@ -41,6 +42,7 @@ def main():
 
     except Exception as e:
         log_error("夕方の報告処理でエラーが発生しました", e)
+        logging.shutdown()
 
 
 if __name__ == "__main__":

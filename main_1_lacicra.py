@@ -3,6 +3,7 @@
 """
 
 # 必要なライブラリ・モジュールをインポート
+import logging
 import sys
 
 # 日付取得用
@@ -111,6 +112,7 @@ def main():
 
     except Exception as e:
         log_error("実行中に予期せぬエラーが発生しました", e)
+        logging.shutdown()
         # error時はウィンドウを閉じずに確認
         sys.exit(1)
 
