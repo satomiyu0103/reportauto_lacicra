@@ -10,6 +10,7 @@ from selenium.common.exceptions import (
     ElementNotInteractableException,
     InvalidSessionIdException,
     NoSuchElementException,
+    NoSuchWindowException,
     StaleElementReferenceException,
     TimeoutException,
     WebDriverException,
@@ -37,6 +38,11 @@ def handle_exceptions(action, element_id):
         )
     except StaleElementReferenceException:
         log_error(f"[警告] '{element_id}'が古くなっています。IDを確認してください")
+    except NoSuchWindowException as e:
+        log_error(
+            f"[致命]対象のウィンドウが見つかりません。（手動で閉じられた可能性があります）処理を中断します。： {e}"
+        )
+        raise  # エラーを呼び出し元に通知してストップ
     except InvalidSessionIdException as e:
         log_error(
             f"[致命]ブラウザセッションが終了しました。処理を中断します。'{element_id}'の操作はスキップされます： {e}"

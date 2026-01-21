@@ -60,7 +60,7 @@ def _setup_logger():
         info_log_path = LOG_DIR / "app_info.log"
         info_handler = logging.handlers.TimedRotatingFileHandler(
             filename=info_log_path,
-            when="D",
+            when="MIDNIGHT",
             interval=1,
             backupCount=30,
             encoding="utf-8",
@@ -81,7 +81,7 @@ def _setup_logger():
         error_log_path = LOG_DIR / "error_info.log"
         error_handler = logging.handlers.TimedRotatingFileHandler(
             filename=error_log_path,
-            when="D",
+            when="MIDNIGHT",
             interval=1,
             backupCount=30,
             encoding="utf-8",
