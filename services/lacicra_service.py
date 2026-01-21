@@ -20,7 +20,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from common.log_handler import log_error
+from common.log_handler import log_error, log_info
 
 
 def handle_exceptions(action, element_id):
@@ -42,19 +42,27 @@ def handle_exceptions(action, element_id):
         log_error(
             f"[致命]対象のウィンドウが見つかりません。（手動で閉じられた可能性があります）処理を中断します。： {e}"
         )
+        log_info(
+            "[致命]対象のウィンドウが見つかりません。（手動で閉じられた可能性があります）処理を中断します。"
+        )
         raise  # エラーを呼び出し元に通知してストップ
     except InvalidSessionIdException as e:
         log_error(
             f"[致命]ブラウザセッションが終了しました。処理を中断します。'{element_id}'の操作はスキップされます： {e}"
         )
+        log_info("[致命]ブラウザセッションが終了しました。処理を中断します。")
         raise  # エラーを呼び出し元に通知してストップ
     except WebDriverException as e:
         log_error(
             f"[致命] WebDriverのエラーが発生しました。処理を中断します。「・・・」>「ヘルプ」>「Google Chromeについて」からChromeのバージョンが最新か確認してください： {e}"
         )
+        log_info(
+            "[致命] WebDriverのエラーが発生しました。処理を中断します。「・・・」>「ヘルプ」>「Google Chromeについて」からChromeのバージョンが最新か確認してください"
+        )
         raise
     except Exception as e:
         log_error(f"[予期せぬエラー] '{element_id}'の処理中に問題が発生しました: {e}")
+        log_info(f"[予期せぬエラー] '{element_id}'の処理中に問題が発生しました")
 
 
 def open_lacicra(LACICRA_URL):
