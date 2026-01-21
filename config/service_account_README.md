@@ -1,4 +1,6 @@
 
+# service_account.jsonについて
+
 {
   "type": "service_account",
   "project_id": "",
@@ -13,16 +15,15 @@
   "universe_domain": ""
 }
 
-# service_account.json について
-
 ## 概要
+
 このファイルは Google Cloud Platform (GCP) のサービスアカウント認証情報を含みます。
 Google Sheets API や Google Drive API にアクセスするために必要です。
 
 ## 各フィールドの説明
 
 | フィールド | 説明 |
-|-----------|------|
+| --- | --- |
 | `type` | 認証タイプ（常に `service_account`） |
 | `project_id` | GCPプロジェクトID |
 | `private_key_id` | 秘密鍵ID |
@@ -44,5 +45,6 @@ Google Sheets API や Google Drive API にアクセスするために必要で�
 ## セキュリティ注意事項
 
 ⚠️ **重要**: 秘密鍵は絶対にGitリポジトリにコミットしないでください
+
 - 環境変数または `.gitignore` で管理する
 - 本番環境では安全に保管する

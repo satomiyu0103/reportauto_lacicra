@@ -26,6 +26,7 @@ from config.settings import (
     EXCEL_FILE_PATH,
     LACICRA_PASSWORD,
     LACICRA_USERNAME,
+    TARGET_MODES_LACICRA,
 )
 
 # Lacicra操作
@@ -87,8 +88,10 @@ def main():
         if report_dict["通所形態"] == "休日":
             log_info("本日はお休みです")
             return
-        elif report_dict["通所形態"] != "在宅":
-            log_info("特殊な利用日です")
+        elif report_dict["通所形態"] not in TARGET_MODES_LACICRA:
+            log_info(
+                f"処理対象外の通所形態のためスキップします: {report_dict['通所形態']}"
+            )
             return
 
         LACICRA_URL = "https://lacicra.jp/login.php"

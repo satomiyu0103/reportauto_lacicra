@@ -8,7 +8,7 @@ from datetime import date
 from common.data_converter import unpack_report
 from common.data_loader import find_today_row, load_data
 from common.log_handler import log_error, log_info
-from config.settings import EXCEL_FILE_PATH
+from config.settings import EXCEL_FILE_PATH, TARGET_MODES_MORNING
 from services.slack_service import send_report
 
 
@@ -26,13 +26,13 @@ def main():
 
         report_data = unpack_report(today_row)
 
-        if report_data["通所形態"] in [
-            "休日",
-            "在宅(午後のみ)",
-            "通所",
-            "職場実習",
-        ]:
-            log_info("特殊な利用日です")
+        if report_data["通所形態"] == "休日":
+            log_info("本日は休日です")
+            return
+        elif report_data["通所形態"] not in TARGET_MODES_MORNING:
+            log_info(
+                f"処理対象外の通所形態のためスキップします: {report_data['通所形態']}"
+            )
             return
 
         # スタッフ宛に送信 (to_staff=True)
