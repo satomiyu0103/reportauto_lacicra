@@ -24,45 +24,61 @@ from common.log_handler import log_error, log_info
 
 
 def handle_exceptions(action, element_id):
+    """
+    指定されたアクションを実行し、発生した例外に応じて適切なレベルでログを記録する。
+    """
     try:
         action()
+
+    # --- [❌ ERROR] 個別の要素操作失敗 (処理は継続可能) ---
     except TimeoutException:
-        log_error(f"[エラー] '{element_id}'の読み込みに時間がかかりすぎています")
+        log_error(f"'{element_id}'の読み込みに時間がかかりすぎています", level="ERROR")
     except NoSuchElementException:
-        log_error(f"[エラー] '{element_id}'が見つかりません。IDを確認してください")
+        log_error(
+            f"'{element_id}'が見つかりません。IDを確認してください", level="ERROR"
+        )
     except ElementClickInterceptedException:
-        log_error(f"[エラー] '{element_id}'がほかの要素によりクリックできません")
+        log_error(f"'{element_id}'がほかの要素によりクリックできません", level="ERROR")
     except ElementNotInteractableException:
         log_error(
-            f"[エラー] '{element_id}'が操作できません。表示状態を確認してください"
+            f"'{element_id}'が操作できません。表示状態を確認してください", level="ERROR"
         )
     except StaleElementReferenceException:
-        log_error(f"[警告] '{element_id}'が古くなっています。IDを確認してください")
+        log_error(
+            f"'{element_id}'が古くなっています(Stale)。再取得が必要です", level="ERROR"
+        )
+
+    # --- [🚨 FATAL] システム・ブラウザ自体のクラッシュ (即時停止) ---
     except NoSuchWindowException as e:
         log_error(
-            f"[致命]対象のウィンドウが見つかりません。（手動で閉じられた可能性があります）処理を中断します。： {e}"
+            f"[致命] 対象のウィンドウが見つかりません（手動で閉じられた可能性があります）。処理を中断します: {e}",
+            level="FATAL",
         )
-        log_info(
-            "[致命]対象のウィンドウが見つかりません。（手動で閉じられた可能性があります）処理を中断します。"
-        )
-        raise  # エラーを呼び出し元に通知してストップ
+        log_info("🚨 処理を中断します。")
+        raise  # 停止
+
     except InvalidSessionIdException as e:
         log_error(
-            f"[致命]ブラウザセッションが終了しました。処理を中断します。'{element_id}'の操作はスキップされます： {e}"
+            f"[致命] ブラウザセッションが終了しました。処理を中断します: {e}",
+            level="FATAL",
         )
-        log_info("[致命]ブラウザセッションが終了しました。処理を中断します。")
-        raise  # エラーを呼び出し元に通知してストップ
+        log_info("🚨 処理を中断します。")
+        raise  # 停止
+
     except WebDriverException as e:
         log_error(
-            f"[致命] WebDriverのエラーが発生しました。処理を中断します。「・・・」>「ヘルプ」>「Google Chromeについて」からChromeのバージョンが最新か確認してください： {e}"
+            f"[致命] WebDriverのエラーです。Chromeのバージョン等を確認してください: {e}",
+            level="FATAL",
         )
-        log_info(
-            "[致命] WebDriverのエラーが発生しました。処理を中断します。「・・・」>「ヘルプ」>「Google Chromeについて」からChromeのバージョンが最新か確認してください"
-        )
-        raise
+        log_info("🚨 処理を中断します。")
+        raise  # 停止
+
+    # --- [❌ ERROR] その他予期せぬエラー ---
     except Exception as e:
-        log_error(f"[予期せぬエラー] '{element_id}'の処理中に問題が発生しました: {e}")
-        log_info(f"[予期せぬエラー] '{element_id}'の処理中に問題が発生しました")
+        log_error(
+            f"[予期せぬエラー] '{element_id}'の処理中に未定義の問題が発生しました: {e}",
+            level="ERROR",
+        )
 
 
 def open_lacicra(LACICRA_URL):

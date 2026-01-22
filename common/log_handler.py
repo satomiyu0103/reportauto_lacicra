@@ -105,17 +105,28 @@ def _setup_logger():
 _setup_logger()
 
 
-def log_error(message, exception=None):
+def log_error(message, exception=None, level="ERROR"):
     """エラーの際にerror.logに記録する
 
     Args:
         message (str): error内容を明記する
-        exception (_type_, optional): エラーメッセージ. Defaults to None.
+        exception (Exception, optional): エラーメッセージ. Defaults to None.
+        level(str): "WARN", "ERROR", "FATAL" のいずれか
     """
+    icons = {
+        "WARN": "⚠️",
+        "ERROR": "❌",
+        "FATAL": "🚨",
+    }
+
+    icon = icons.get(level, "❌")
+
+    formatted_message = f"{icon} {message}"
+
     if exception:
-        logging.error(f"{message}: {exception}")
+        logging.error(f"{formatted_message}: {exception}")
     else:
-        logging.error(message)
+        logging.error(formatted_message)
 
 
 def log_info(message):

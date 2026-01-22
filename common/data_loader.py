@@ -162,9 +162,9 @@ def find_today_row(data_list, target_date):
                 continue
 
         if row_date == target_date:
-            log_info("データが見つかりました")
+            log_info("🔦 データが見つかりました")
             return row
 
-    log_error("今日のデータが見つかりませんでした")
+    log_error("❌ 今日のデータが見つかりませんでした")
 
     return None
