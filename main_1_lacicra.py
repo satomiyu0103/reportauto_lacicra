@@ -10,7 +10,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 
 # データ変換
-from common.data_converter import data_conv, unpack_report
+from common.data_converter import convert_to_model
 
 # データ取得
 from common.data_loader import (
@@ -64,33 +64,23 @@ def main():
             message = (
                 f"❌ {today} の日報データが見つかりませんでした。処理を終了します。"
             )
-            log_error(message)
+            log_info(message)
             return
 
         # データの辞書化と変換
-        report_dict = unpack_report(report)
-        (
-            report_dict["体温"],
-            report_dict["開始予定時刻"],
-            report_dict["終了予定時刻"],
-            report_dict["開始時刻"],
-            report_dict["終了時刻"],
-            report_dict["就寝時刻"],
-            report_dict["起床時刻"],
-            report_dict["寝起き"],
-            report_dict["起床時のやる気"],
-            report_dict["昼食"],
-            report_dict["夕食"],
-            report_dict["朝食"],
-        ) = data_conv(report_dict)
+        report_data = convert_to_model(report)
+
+        if not report_data:
+            log_info("❌ レポートデータの生成に失敗しました")
+            return
 
         # Web操作
-        if report_dict["通所形態"] == "休日":
+        if report_data.usage_type == "休日":
             log_info("本日はお休みです")
             return
-        elif report_dict["通所形態"] not in TARGET_MODES_LACICRA:
+        elif report_data.usage_type not in TARGET_MODES_LACICRA:
             log_info(
-                f"処理対象外の通所形態のためスキップします: {report_dict['通所形態']}"
+                f"処理対象外の通所形態のためスキップします: {report_data.usage_type}"
             )
             return
 
@@ -106,9 +96,9 @@ def main():
         log_info("⌛ ログイン作業中")
 
         today_report_btn_click(wait)
-        input_today_summarys(wait, report_dict)
-        today_slp_status_click(wait, report_dict)
-        today_meal_click(wait, report_dict)
+        input_today_summarys(wait, report_data)
+        today_slp_status_click(wait, report_data)
+        today_meal_click(wait, report_data)
         save_button_click(wait)
 
         log_info("✅ Lacicra処理が正常終了しました")

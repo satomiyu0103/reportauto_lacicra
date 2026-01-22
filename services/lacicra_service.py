@@ -24,6 +24,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+from common.data_converter import DailyReport
 from common.log_handler import log_error, log_info
 
 
@@ -143,9 +144,11 @@ def today_report_btn_click(wait):
 
 
 # 日報のワードを送信する
-def input_summary(wait: WebDriverWait, input_id: str, summary: str | None) -> None:
+def input_summary(wait: WebDriverWait, input_id: str, summary) -> None:
     if summary is None:
         summary = "未入力"
+    else:
+        summary
 
     summary_input: WebElement = wait.until(
         EC.element_to_be_clickable((By.ID, input_id))
@@ -157,7 +160,7 @@ def input_summary(wait: WebDriverWait, input_id: str, summary: str | None) -> No
 
 
 # 今日の日報を入力する
-def input_today_summarys(wait: WebDriverWait, report_dict: dict[str, Any]) -> None:
+def input_today_summarys(wait: WebDriverWait, report_dict: DailyReport) -> None:
     # 通所について
     TEMP_INPUT_ID = "textfield-1132-inputEl"  # 体温
     START_PLAN_INPUT_ID = "timefield-1136-inputEl"  # 開始予定時間
@@ -177,48 +180,48 @@ def input_today_summarys(wait: WebDriverWait, report_dict: dict[str, Any]) -> No
     REMARKS_INPUT_ID = "textarea-1213-inputEl"  # 備考
 
     handle_exceptions(
-        lambda: input_summary(wait, TEMP_INPUT_ID, report_dict["体温"]), TEMP_INPUT_ID
+        lambda: input_summary(wait, TEMP_INPUT_ID, report_dict.body_temp), TEMP_INPUT_ID
     )  # 体温を入力
     handle_exceptions(
-        lambda: input_summary(wait, START_PLAN_INPUT_ID, report_dict["開始予定時刻"]),
+        lambda: input_summary(wait, START_PLAN_INPUT_ID, report_dict.start_plan_time),
         START_PLAN_INPUT_ID,
     )  # 来所予定時間を入力
     handle_exceptions(
-        lambda: input_summary(wait, END_PLAN_INPUT_ID, report_dict["終了予定時刻"]),
+        lambda: input_summary(wait, END_PLAN_INPUT_ID, report_dict.end_plan_time),
         END_PLAN_INPUT_ID,
     )  # 退所予定時間を入力
     handle_exceptions(
-        lambda: input_summary(wait, START_ACTUAL_INPUT_ID, report_dict["開始時刻"]),
+        lambda: input_summary(wait, START_ACTUAL_INPUT_ID, report_dict.start_time),
         START_ACTUAL_INPUT_ID,
     )  # 来所時間を入力
     handle_exceptions(
-        lambda: input_summary(wait, END_ACTUAL_INPUT_ID, report_dict["終了時刻"]),
+        lambda: input_summary(wait, END_ACTUAL_INPUT_ID, report_dict.end_time),
         END_ACTUAL_INPUT_ID,
     )  # 退所時間を入力
 
     # 午前・午後の取組
     handle_exceptions(
-        lambda: input_summary(wait, AM_TASKS_INPUT_ID, report_dict["午前業務"]),
+        lambda: input_summary(wait, AM_TASKS_INPUT_ID, report_dict.am_activity),
         AM_TASKS_INPUT_ID,
     )  # 午前の取組を入力
     handle_exceptions(
-        lambda: input_summary(wait, PM_TASKS_INPUT_ID, report_dict["午後業務"]),
+        lambda: input_summary(wait, PM_TASKS_INPUT_ID, report_dict.pm_activity),
         PM_TASKS_INPUT_ID,
     )  # 午後の取組を入力
 
     ## 日報を入力
     handle_exceptions(
-        lambda: input_summary(wait, DAILY_REPORT_INPUT_ID, report_dict["日報"]),
+        lambda: input_summary(wait, DAILY_REPORT_INPUT_ID, report_dict.activity_report),
         DAILY_REPORT_INPUT_ID,
     )  # 日報を入力
 
     ## 睡眠についてを入力
     handle_exceptions(
-        lambda: input_summary(wait, SLP_TIME_INPUT_ID, report_dict["就寝時刻"]),
+        lambda: input_summary(wait, SLP_TIME_INPUT_ID, report_dict.bed_time),
         SLP_TIME_INPUT_ID,
     )  # 就寝時刻を入力
     handle_exceptions(
-        lambda: input_summary(wait, WK_TIME_INPUT_ID, report_dict["起床時刻"]),
+        lambda: input_summary(wait, WK_TIME_INPUT_ID, report_dict.wake_up_time),
         WK_TIME_INPUT_ID,
     )  # 起床時刻を入力
     handle_exceptions(
@@ -246,39 +249,31 @@ def slp_status_click(wait, slp_status, btn_ids):
     slp_btn_id.click()
 
 
-def today_slp_status_click(wait, report_dict):
+def today_slp_status_click(wait, report_dict: DailyReport):
     # 睡眠について選択
-    WAKE_FEEL_BTN_ID_1 = "radiofield-1184-inputEl"
-    WAKE_FEEL_BTN_ID_2 = "radiofield-1185-inputEl"
-    WAKE_FEEL_BTN_ID_3 = "radiofield-1186-inputEl"
-    WAKE_FEEL_BTN_ID_4 = "radiofield-1187-inputEl"
-    WAKE_MOT_BTN_ID_1 = "radiofield-1190-inputEl"
-    WAKE_MOT_BTN_ID_2 = "radiofield-1191-inputEl"
-    WAKE_MOT_BTN_ID_3 = "radiofield-1192-inputEl"
-    WAKE_MOT_BTN_ID_4 = "radiofield-1193-inputEl"
 
     wake_feel_btn_ids = {
-        1: WAKE_FEEL_BTN_ID_1,
-        2: WAKE_FEEL_BTN_ID_2,
-        3: WAKE_FEEL_BTN_ID_3,
-        4: WAKE_FEEL_BTN_ID_4,
+        1: "radiofield-1184-inputEl",
+        2: "radiofield-1185-inputEl",
+        3: "radiofield-1186-inputEl",
+        4: "radiofield-1187-inputEl",
     }
 
     wake_mot_btn_ids = {
-        1: WAKE_MOT_BTN_ID_1,
-        2: WAKE_MOT_BTN_ID_2,
-        3: WAKE_MOT_BTN_ID_3,
-        4: WAKE_MOT_BTN_ID_4,
+        1: "radiofield-1190-inputEl",
+        2: "radiofield-1191-inputEl",
+        3: "radiofield-1192-inputEl",
+        4: "radiofield-1193-inputEl",
     }
 
     # wake_feel, wake_mot
     handle_exceptions(
-        lambda: slp_status_click(wait, report_dict["寝起き"], wake_feel_btn_ids),
-        wake_feel_btn_ids,
+        lambda: slp_status_click(wait, report_dict.wake_up_score, wake_feel_btn_ids),
+        "寝起き(wake_feel)ボタン",
     )
     handle_exceptions(
-        lambda: slp_status_click(wait, report_dict["起床時のやる気"], wake_mot_btn_ids),
-        wake_mot_btn_ids,
+        lambda: slp_status_click(wait, report_dict.motivation_score, wake_mot_btn_ids),
+        "やる気(wake_mot)ボタン",
     )
 
 
@@ -286,8 +281,8 @@ def meal_click(wait, meal, meal_btn_ids):
     try:
         meal = int(meal)
     except (ValueError, TypeError):
-        log_error(f"食事の値が不正です: {meal}")
         meal = 1
+        log_error(f"食事の値が不正です: {meal}")
 
     if meal not in [1, 2]:
         log_error(f"{meal}が範囲外です。1を設定します")
@@ -297,28 +292,22 @@ def meal_click(wait, meal, meal_btn_ids):
     meal_btn_id.click()
 
 
-def today_meal_click(wait, report_dict):
+def today_meal_click(wait, report_dict: DailyReport):
     # 食事について選択
-    LUNCH_BTN_ID_1 = "radiofield-1198-inputEl"
-    LUNCH_BTN_ID_2 = "radiofield-1199-inputEl"
-    DINNER_BTN_ID_1 = "radiofield-1202-inputEl"
-    DINNER_BTN_ID_2 = "radiofield-1203-inputEl"
-    BF_BTN_ID_1 = "radiofield-1206-inputEl"
-    BF_BTN_ID_2 = "radiofield-1207-inputEl"
+    lunch_btn_ids = {1: "radiofield-1198-inputEl", 2: "radiofield-1199-inputEl"}
 
-    lunch_btn_ids = {1: LUNCH_BTN_ID_1, 2: LUNCH_BTN_ID_2}
+    dinner_btn_ids = {1: "radiofield-1202-inputEl", 2: "radiofield-1203-inputEl"}
 
-    dinner_btn_ids = {1: DINNER_BTN_ID_1, 2: DINNER_BTN_ID_2}
-
-    bf_btn_ids = {1: BF_BTN_ID_1, 2: BF_BTN_ID_2}
+    bf_btn_ids = {1: "radiofield-1206-inputEl", 2: "radiofield-1207-inputEl"}
     handle_exceptions(
-        lambda: meal_click(wait, report_dict["昼食"], lunch_btn_ids), lunch_btn_ids
+        lambda: meal_click(wait, report_dict.lunch_score, lunch_btn_ids), "昼食ボタン"
     )
     handle_exceptions(
-        lambda: meal_click(wait, report_dict["夕食"], dinner_btn_ids), dinner_btn_ids
+        lambda: meal_click(wait, report_dict.dinner_score, dinner_btn_ids),
+        "夕食ボタン",
     )
     handle_exceptions(
-        lambda: meal_click(wait, report_dict["朝食"], bf_btn_ids), bf_btn_ids
+        lambda: meal_click(wait, report_dict.breakfast_score, bf_btn_ids), "朝食ボタン"
     )
 
 

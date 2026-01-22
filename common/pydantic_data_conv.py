@@ -61,25 +61,6 @@ class DailyReport(BaseModel):
         "extra": "ignore",  # 定義にないカラムが来てもエラーにしない
     }
 
-    @field_validator(
-        "wake_up_score",
-        "motivation_score",
-        "lunch_score",
-        "dinner_score",
-        "breakfast_score",
-        "body_temp",
-        "body_weight",
-        "waist_circumference",
-        "walk_steps",
-        mode="before",
-    )
-    @classmethod
-    def empty_string_to_none(cls, v: Any) -> Any:
-        # 空文字ならNone
-        if v == "":
-            return None
-        return v
-
     @field_validator("body_temp", mode="before")
     @classmethod
     def validate_temp(cls, v: Any) -> float:

@@ -7,6 +7,7 @@ from typing import Any
 
 import requests
 
+from common.data_converter import DailyReport
 from common.log_handler import log_error, log_info
 from config.settings import SLACK_WEBHOOK_URL_TOME, SLACK_WEBHOOK_URL_TOSTUFF
 
@@ -32,44 +33,44 @@ def _send_slack(message: str, webhook_url: str | None) -> Any:
         log_error("Slack送信中にエラーが発生", e)
 
 
-def create_morning_message(data: dict[str, Any]) -> str:
+def create_morning_message(data: DailyReport) -> str:
     """朝報のメッセージを作成"""
     # 必須項目のチェック
-    if not data.get("日付"):
+    if not data:
         return "⚠️ 日付データが取得できませんでした。"
 
     msg = f"""【定時報告】
-①体調｜{data.get("体調")}（理由：{data.get("体調の理由")}）
-②{data.get("通所形態")}
-　午前｜{data.get("午前予定")}
-　午後｜{data.get("午後予定")}
-③体温｜{data.get("体温")}℃　{data.get("起床時刻")}
+①体調｜{data.condition}（理由：{data.condition_reason or "なし"}）
+②{data.usage_type}
+　午前｜{data.am_plan}
+　午後｜{data.pm_plan}
+③体温｜{data.body_temp}℃　{data.wake_up_time}
 ④ルーティン
-　昨日｜散歩{data.get("歩数")}歩　自学習{data.get("自習時間")}分
-　　　｜入浴{data.get("入浴")}　ストレッチ{data.get("ストレッチ")}　就寝(7h↑){data.get("睡眠")}
-　今日｜測定(体温・体重・腹囲){data.get("測定")}　朝食(1.食べた 2.食べてない){data.get("朝食")}
+　昨日｜散歩{data.walk_steps}歩　自学習{data.study_time}分
+　　　｜入浴{data.bath_status}　ストレッチ{data.stretch_status}　就寝(7h↑){data.sleep_status}
+　今日｜測定(体温・体重・腹囲){data.measurement_status}　朝食(1.食べた 2.食べてない){data.breakfast_score}
 """
     return msg
 
 
-def create_evening_message(data):
+def create_evening_message(data: DailyReport) -> str:
     """夕報のメッセージを作成"""
     msg = f"""【終了報告】
 〇学習内容/進捗
-・午前｜{data.get("午前業務")}
-・午後｜{data.get("午後業務")}
+・午前｜{data.am_activity or ""}
+・午後｜{data.pm_activity or ""}
 
 〇感想
-{data.get("日報")}
+{data.activity_report or ""}
 
 〇ルーティン/仕事術
-・わんこそば仕事術　{data.get("わんこそば仕事術")}％
-・一極集中仕事術　{data.get("一極集中仕事術")}％
-・耳と目で確認するミス防止術　{data.get("耳目確認")}％
-・フォルダ命名規則を作る仕事術　{data.get("ファイル命名規則")}％
+・わんこそば仕事術　{data.wanko_method}％
+・一極集中仕事術　{data.ikkyoku_method}％
+・耳と目で確認するミス防止術　{data.mimoku_check}％
+・フォルダ命名規則を作る仕事術　{data.naming_rule}％
 
 〇次回の目標/ToDo
-{data.get("次回活動予定")}を進めます。
+{data.next_plan}を進めます。
 """
     return msg
 
