@@ -147,16 +147,15 @@ def today_report_btn_click(wait):
 def input_summary(wait: WebDriverWait, input_id: str, summary) -> None:
     if summary is None:
         summary = "未入力"
-    else:
-        summary
+
+    summary_str = str(summary)
 
     summary_input: WebElement = wait.until(
         EC.element_to_be_clickable((By.ID, input_id))
     )
 
-    summary_input = wait.until(EC.element_to_be_clickable((By.ID, input_id)))
     summary_input.clear()
-    summary_input.send_keys(summary)
+    summary_input.send_keys(summary_str)
 
 
 # 今日の日報を入力する
