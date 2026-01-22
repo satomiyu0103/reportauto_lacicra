@@ -105,6 +105,7 @@ def main():
 
     except Exception as e:
         log_error("実行中に予期せぬエラーが発生しました", e)
+        log_info("⛔ プログラムを異常終了します")
         logging.shutdown()
         # error時はウィンドウを閉じずに確認
         sys.exit(1)
