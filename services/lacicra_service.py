@@ -3,6 +3,8 @@
 =========="""
 
 # 必要なライブラリ・モジュールをインポート
+from typing import Any, Callable
+
 ## LACICRAの操作
 from selenium import webdriver
 from selenium.common.exceptions import (
@@ -17,13 +19,15 @@ from selenium.common.exceptions import (
 )
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from common.log_handler import log_error, log_info
 
 
-def handle_exceptions(action, element_id):
+def handle_exceptions(action: Callable[[], Any], element_id: str) -> None:
     """
     指定されたアクションを実行し、発生した例外に応じて適切なレベルでログを記録する。
     """
@@ -81,7 +85,7 @@ def handle_exceptions(action, element_id):
         )
 
 
-def open_lacicra(LACICRA_URL):
+def open_lacicra(LACICRA_URL: str) -> tuple[WebDriver, WebDriverWait]:
     # Lacicraのサイトを開く
     ## Selenium実行後もChromeを開いたままにする
     options = Options()
@@ -103,7 +107,7 @@ def open_lacicra(LACICRA_URL):
         raise
 
 
-def send_login_key(wait, input_id, key):
+def send_login_key(wait: WebDriverWait, input_id: str, key: str) -> None:
     x_input_id = wait.until(EC.presence_of_element_located((By.ID, input_id)))
     x_input_id.clear()
     x_input_id.send_keys(key)
@@ -139,9 +143,13 @@ def today_report_btn_click(wait):
 
 
 # 日報のワードを送信する
-def input_summary(wait, input_id, summary):
+def input_summary(wait: WebDriverWait, input_id: str, summary: str | None) -> None:
     if summary is None:
         summary = "未入力"
+
+    summary_input: WebElement = wait.until(
+        EC.element_to_be_clickable((By.ID, input_id))
+    )
 
     summary_input = wait.until(EC.element_to_be_clickable((By.ID, input_id)))
     summary_input.clear()
@@ -149,7 +157,7 @@ def input_summary(wait, input_id, summary):
 
 
 # 今日の日報を入力する
-def input_today_summarys(wait, report_dict):
+def input_today_summarys(wait: WebDriverWait, report_dict: dict[str, Any]) -> None:
     # 通所について
     TEMP_INPUT_ID = "textfield-1132-inputEl"  # 体温
     START_PLAN_INPUT_ID = "timefield-1136-inputEl"  # 開始予定時間
