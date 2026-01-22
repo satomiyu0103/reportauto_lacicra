@@ -3,7 +3,8 @@
 =========="""
 
 import os
-from datetime import datetime
+from datetime import date, datetime
+from typing import Any, Optional
 
 ## gspreadの操作
 import gspread
@@ -47,7 +48,7 @@ def find_key_path(KEY_FILE_NAME: str):
         return None
 
 
-def load_data(file_path=None):
+def load_data(file_path: Optional[str] = None) -> list[list[Any]]:
     """_summary_設定（DATA_SAUCE）に基づいて、ExcelまたはGoogleシートからデータを読み込む
 
     Args:
@@ -132,7 +133,7 @@ def _load_from_gspread():
     return converted_rows
 
 
-def find_today_row(data_list, target_date):
+def find_today_row(data_list: list[list[Any]], target_date: date) -> list[Any] | None:
     """_summary_:データリストから指定された日付の行を探して返します
 
     Args:

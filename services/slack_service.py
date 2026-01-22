@@ -3,6 +3,7 @@
 =========="""
 
 import json
+from typing import Any
 
 import requests
 
@@ -10,7 +11,7 @@ from common.log_handler import log_error, log_info
 from config.settings import SLACK_WEBHOOK_URL_TOME, SLACK_WEBHOOK_URL_TOSTUFF
 
 
-def _send_slack(message, webhook_url):
+def _send_slack(message: str, webhook_url: str | None) -> Any:
     """内部利用: SlackにメッセージをPOSTする"""
     if not webhook_url:
         log_error("Slack Webhook URLが設定されていません")
@@ -31,7 +32,7 @@ def _send_slack(message, webhook_url):
         log_error("Slack送信中にエラーが発生", e)
 
 
-def create_morning_message(data):
+def create_morning_message(data: dict[str, Any]) -> str:
     """朝報のメッセージを作成"""
     # 必須項目のチェック
     if not data.get("日付"):

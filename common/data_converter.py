@@ -2,10 +2,12 @@
 ■ データの変換
 =========="""
 
+from typing import Any
+
 from common.log_handler import log_error
 
 
-def unpack_report(report):
+def unpack_report(report: list[Any]) -> dict[str, Any]:
     keys = [
         "日付",
         "体調",
@@ -45,7 +47,7 @@ def unpack_report(report):
     return dict(zip(keys, report))
 
 
-def temp_conv(report_dict):
+def temp_conv(report_dict: dict[str, Any]) -> str:
     ## 体温を小数点以下まで表示
     try:
         val = report_dict.get("体温")
@@ -111,7 +113,7 @@ def time_conv(report_dict):
     return converted_times
 
 
-def data_conv(report_dict):
+def data_conv(report_dict: dict[str, Any]) -> tuple[Any, ...]:
     """体温・時刻データを整える
 
     Args:
