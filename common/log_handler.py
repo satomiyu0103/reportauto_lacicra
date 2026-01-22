@@ -49,7 +49,7 @@ def _setup_logger():
             source (_str_): _description_
             dest (_str_): _description_
         """
-        if os.path.exists(source, dest):
+        if os.path.exists(source):
             if os.path.exists(dest):
                 os.remove(dest)
             shutil.move(source, dest)
