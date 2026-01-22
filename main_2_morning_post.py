@@ -36,9 +36,9 @@ def main():
             return
 
         # スタッフ宛に送信 (to_staff=True)
-        # send_report(report_data, report_type="morning", to_staff=True)
+        send_report(report_data, report_type="morning", to_staff=True)
         # 自分宛にも送信したい場合は以下を有効化
-        send_report(report_data, report_type="morning", to_staff=False)
+        # send_report(report_data, report_type="morning", to_staff=False)
 
     except Exception as e:
         log_error("朝の報告処理でエラーが発生しました", e)
