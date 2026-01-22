@@ -82,7 +82,7 @@ class DailyReport(BaseModel):
 
     @field_validator("body_temp", mode="before")
     @classmethod
-    def validate_temp(cls, v: Any) -> float:
+    def validate_temp(cls, v: Any) -> float | Any:
         """
         既存の temp_conv ロジックの移植
 
@@ -94,11 +94,11 @@ class DailyReport(BaseModel):
         """
         try:
             if not v:
-                return 0.0  # デフォルト
+                return ""  # デフォルト
             return float(v)
         except (ValueError, TypeError) as e:
             log_error("体温の値が正しくありません", e)
-            return 99.9
+            return ""
 
     @field_validator("start_plan_time", "end_plan_time", mode="before")
     @classmethod
