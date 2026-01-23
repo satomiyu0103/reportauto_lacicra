@@ -95,10 +95,15 @@ def main():
         # 手動でログイン
         log_info("⌛ ログイン作業中")
 
+        log_info("📒 本日のページを開きます")
         today_report_btn_click(wait)
+
+        log_info("✍ 本日の報告を入力します")
         input_today_summarys(wait, report_data)
         today_slp_status_click(wait, report_data)
         today_meal_click(wait, report_data)
+
+        log_info("💾 本日の報告を保存します")
         save_button_click(wait)
 
         log_info("✅ Lacicra処理が正常終了しました")

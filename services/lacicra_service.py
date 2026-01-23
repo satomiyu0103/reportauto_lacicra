@@ -233,7 +233,7 @@ def input_today_summarys(wait: WebDriverWait, report_data: DailyReport) -> None:
             summary = " "
         else:
             summary = getattr(report_data, attr_name, None)
-            log_info(summary)
+            log_info(f"{attr_name}を入力しています。")
 
         handle_exceptions(
             lambda: input_summary(wait, elem_name, elem_id, summary),
@@ -275,6 +275,7 @@ def today_slp_status_click(wait: WebDriverWait, daily_report: DailyReport) -> No
     """睡眠・やる気ステータスの選択 (DailyReport対応版)"""
 
     # 属性アクセスに変更: daily_report.wake_up_score / motivation_score
+    log_info("sleep_scoreを選択します")
     handle_exceptions(
         lambda: slp_status_click(wait, daily_report.wake_up_score, WAKE_FEEL_BTN_IDS),
         "WakeUp Score Select",
@@ -309,6 +310,7 @@ def meal_click(wait, meal, meal_btn_ids):
 def today_meal_click(wait: WebDriverWait, daily_report: DailyReport) -> None:
     """食事ステータスの選択 (DailyReport対応版)"""
     # 属性アクセスに変更
+    log_info("meal_scoreを選択します")
     handle_exceptions(
         lambda: meal_click(wait, daily_report.lunch_score, LUNCH_BTN_IDS),
         "Lunch Select",
