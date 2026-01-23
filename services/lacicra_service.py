@@ -143,94 +143,102 @@ def today_report_btn_click(wait):
     )
 
 
-# 日報のワードを送信する
-def input_summary(wait: WebDriverWait, input_id: str, summary) -> None:
+def summary_input_by_name(wait: WebDriverWait, input_name: str, summary):
+    """Name属性を利用して要素を特定し入力する"""
+    summary_input: WebElement = wait.until(
+        EC.element_to_be_clickable((By.NAME, input_name))
+    )
+    summary_input.clear()
+    summary_input.send_keys(summary)
+
+
+def summary_input_by_id(wait: WebDriverWait, input_id: str, summary):
+    """ID属性を使用して要素を特定し入力する"""
+    summary_input: WebElement = wait.until(
+        EC.element_to_be_clickable((By.ID, input_id))
+    )
+    summary_input.clear()
+    summary_input.send_keys(summary)
+
+
+def input_summary(wait: WebDriverWait, input_name: str, input_id: str, summary) -> None:
+    """日報のワードを送信する"""
     if summary is None:
         summary = "未入力"
 
     summary_str = str(summary)
 
-    summary_input: WebElement = wait.until(
-        EC.element_to_be_clickable((By.ID, input_id))
-    )
+    if input_name:
+        try:
+            summary_input_by_name(wait, input_name, summary_str)
+            return
+        except Exception:
+            log_error("入力の要素が見つかりません")
+            pass
+    summary_input_by_id(wait, input_id, summary_str)
 
-    summary_input.clear()
-    summary_input.send_keys(summary_str)
+
+# 入力項目の定義： (辞書のキー, HTML ID, HTML Name)
+# ※ Nameが不明な箇所は None としています。判明次第書き換えてください。
+INPUT_FIELDS = [
+    # 通所・時間系
+    {"attr": "body_temp", "id": "textfield-1132-inputEl", "name": "temperature"},
+    {
+        "attr": "start_plan_time",
+        "id": "timefield-1136-inputEl",
+        "name": "reserve_start_time",
+    },
+    {
+        "attr": "end_plan_time",
+        "id": "timefield-1140-inputEl",
+        "name": "reserve_end_time",
+    },
+    {"attr": "start_time", "id": "timefield-1145-inputEl", "name": "start_time"},
+    {"attr": "end_time", "id": "timefield-1149-inputEl", "name": "end_time"},
+    # 業務内容
+    {
+        "attr": "am_activity",
+        "id": "textarea-1156-inputEl",
+        "name": "program_group1_memo",
+    },
+    {
+        "attr": "pm_activity",
+        "id": "textarea-1160-inputEl",
+        "name": "program_group11_memo",
+    },
+    {"attr": "activity_report", "id": "textarea-1172-inputEl", "name": "case_user"},
+    # 睡眠系
+    {"attr": "bed_time", "id": "timefield-1175-inputEl", "name": "sleep_start_time"},
+    {"attr": "wake_up_time", "id": "timefield-1180-inputEl", "name": "sleep_end_time"},
+    # 特殊: 固定値入力の項目は辞書キーではなく専用キーで定義し、下部で値を注入
+    {"attr": "__SLEEP_MEMO__", "id": "textarea-1195-inputEl", "name": "sleep_remarks"},
+    # 備考
+    {"attr": "__REMARKS__", "id": "textarea-1213-inputEl", "name": "remarks"},
+]
 
 
 # 今日の日報を入力する
-def input_today_summarys(wait: WebDriverWait, report_dict: DailyReport) -> None:
+def input_today_summarys(wait: WebDriverWait, report_data: DailyReport) -> None:
     # 通所について
-    TEMP_INPUT_ID = "textfield-1132-inputEl"  # 体温
-    START_PLAN_INPUT_ID = "timefield-1136-inputEl"  # 開始予定時間
-    END_PLAN_INPUT_ID = "timefield-1140-inputEl"  # 終了予定時間
-    START_ACTUAL_INPUT_ID = "timefield-1145-inputEl"  # 開始実績時間
-    END_ACTUAL_INPUT_ID = "timefield-1149-inputEl"  # 終了実績時間
 
-    AM_TASKS_INPUT_ID = "textarea-1156-inputEl"  # 午前予定
-    PM_TASKS_INPUT_ID = "textarea-1160-inputEl"  # 午後予定
+    for field in INPUT_FIELDS:
+        summary: Any
+        attr_name = field["attr"]
+        elem_id = field["id"]
+        elem_name = field["name"]
 
-    DAILY_REPORT_INPUT_ID = "textarea-1172-inputEl"  # 日報
+        if attr_name == "__SLEEP_MEMO__":
+            summary = " "
+        elif attr_name == "__REMARKS__":
+            summary = " "
+        else:
+            summary = getattr(report_data, attr_name, None)
+            log_info(summary)
 
-    SLP_TIME_INPUT_ID = "timefield-1175-inputEl"  # 就寝時間
-    WK_TIME_INPUT_ID = "timefield-1180-inputEl"  # 起床時間
-    SLP_MEMO_INPUT_ID = "textarea-1195-inputEl"  # 睡眠メモ
-
-    REMARKS_INPUT_ID = "textarea-1213-inputEl"  # 備考
-
-    handle_exceptions(
-        lambda: input_summary(wait, TEMP_INPUT_ID, report_dict.body_temp), TEMP_INPUT_ID
-    )  # 体温を入力
-    handle_exceptions(
-        lambda: input_summary(wait, START_PLAN_INPUT_ID, report_dict.start_plan_time),
-        START_PLAN_INPUT_ID,
-    )  # 来所予定時間を入力
-    handle_exceptions(
-        lambda: input_summary(wait, END_PLAN_INPUT_ID, report_dict.end_plan_time),
-        END_PLAN_INPUT_ID,
-    )  # 退所予定時間を入力
-    handle_exceptions(
-        lambda: input_summary(wait, START_ACTUAL_INPUT_ID, report_dict.start_time),
-        START_ACTUAL_INPUT_ID,
-    )  # 来所時間を入力
-    handle_exceptions(
-        lambda: input_summary(wait, END_ACTUAL_INPUT_ID, report_dict.end_time),
-        END_ACTUAL_INPUT_ID,
-    )  # 退所時間を入力
-
-    # 午前・午後の取組
-    handle_exceptions(
-        lambda: input_summary(wait, AM_TASKS_INPUT_ID, report_dict.am_activity),
-        AM_TASKS_INPUT_ID,
-    )  # 午前の取組を入力
-    handle_exceptions(
-        lambda: input_summary(wait, PM_TASKS_INPUT_ID, report_dict.pm_activity),
-        PM_TASKS_INPUT_ID,
-    )  # 午後の取組を入力
-
-    ## 日報を入力
-    handle_exceptions(
-        lambda: input_summary(wait, DAILY_REPORT_INPUT_ID, report_dict.activity_report),
-        DAILY_REPORT_INPUT_ID,
-    )  # 日報を入力
-
-    ## 睡眠についてを入力
-    handle_exceptions(
-        lambda: input_summary(wait, SLP_TIME_INPUT_ID, report_dict.bed_time),
-        SLP_TIME_INPUT_ID,
-    )  # 就寝時刻を入力
-    handle_exceptions(
-        lambda: input_summary(wait, WK_TIME_INPUT_ID, report_dict.wake_up_time),
-        WK_TIME_INPUT_ID,
-    )  # 起床時刻を入力
-    handle_exceptions(
-        lambda: input_summary(wait, SLP_MEMO_INPUT_ID, " "), SLP_MEMO_INPUT_ID
-    )  # memoを入力
-
-    # 備考を入力
-    handle_exceptions(
-        lambda: input_summary(wait, REMARKS_INPUT_ID, ""), REMARKS_INPUT_ID
-    )  # 備考を入力
+        handle_exceptions(
+            lambda: input_summary(wait, elem_name, elem_id, summary),
+            f"{elem_id} (attr: {attr_name})",
+        )
 
 
 def slp_status_click(wait, slp_status, btn_ids):
@@ -248,32 +256,39 @@ def slp_status_click(wait, slp_status, btn_ids):
     slp_btn_id.click()
 
 
-def today_slp_status_click(wait, report_dict: DailyReport):
-    # 睡眠について選択
+# ID定義 (変更なし)
+WAKE_FEEL_BTN_IDS = {
+    1: "radiofield-1184-inputEl",
+    2: "radiofield-1185-inputEl",
+    3: "radiofield-1186-inputEl",
+    4: "radiofield-1187-inputEl",
+}
+WAKE_MOT_BTN_IDS = {
+    1: "radiofield-1190-inputEl",
+    2: "radiofield-1191-inputEl",
+    3: "radiofield-1192-inputEl",
+    4: "radiofield-1193-inputEl",
+}
 
-    wake_feel_btn_ids = {
-        1: "radiofield-1184-inputEl",
-        2: "radiofield-1185-inputEl",
-        3: "radiofield-1186-inputEl",
-        4: "radiofield-1187-inputEl",
-    }
 
-    wake_mot_btn_ids = {
-        1: "radiofield-1190-inputEl",
-        2: "radiofield-1191-inputEl",
-        3: "radiofield-1192-inputEl",
-        4: "radiofield-1193-inputEl",
-    }
+def today_slp_status_click(wait: WebDriverWait, daily_report: DailyReport) -> None:
+    """睡眠・やる気ステータスの選択 (DailyReport対応版)"""
 
-    # wake_feel, wake_mot
+    # 属性アクセスに変更: daily_report.wake_up_score / motivation_score
     handle_exceptions(
-        lambda: slp_status_click(wait, report_dict.wake_up_score, wake_feel_btn_ids),
-        "寝起き(wake_feel)ボタン",
+        lambda: slp_status_click(wait, daily_report.wake_up_score, WAKE_FEEL_BTN_IDS),
+        "WakeUp Score Select",
     )
     handle_exceptions(
-        lambda: slp_status_click(wait, report_dict.motivation_score, wake_mot_btn_ids),
-        "やる気(wake_mot)ボタン",
+        lambda: slp_status_click(wait, daily_report.motivation_score, WAKE_MOT_BTN_IDS),
+        "Motivation Score Select",
     )
+
+
+# ID定義 (変更なし)
+LUNCH_BTN_IDS = {1: "radiofield-1198-inputEl", 2: "radiofield-1199-inputEl"}
+DINNER_BTN_IDS = {1: "radiofield-1202-inputEl", 2: "radiofield-1203-inputEl"}
+BF_BTN_IDS = {1: "radiofield-1206-inputEl", 2: "radiofield-1207-inputEl"}
 
 
 def meal_click(wait, meal, meal_btn_ids):
@@ -291,22 +306,20 @@ def meal_click(wait, meal, meal_btn_ids):
     meal_btn_id.click()
 
 
-def today_meal_click(wait, report_dict: DailyReport):
-    # 食事について選択
-    lunch_btn_ids = {1: "radiofield-1198-inputEl", 2: "radiofield-1199-inputEl"}
-
-    dinner_btn_ids = {1: "radiofield-1202-inputEl", 2: "radiofield-1203-inputEl"}
-
-    bf_btn_ids = {1: "radiofield-1206-inputEl", 2: "radiofield-1207-inputEl"}
+def today_meal_click(wait: WebDriverWait, daily_report: DailyReport) -> None:
+    """食事ステータスの選択 (DailyReport対応版)"""
+    # 属性アクセスに変更
     handle_exceptions(
-        lambda: meal_click(wait, report_dict.lunch_score, lunch_btn_ids), "昼食ボタン"
+        lambda: meal_click(wait, daily_report.lunch_score, LUNCH_BTN_IDS),
+        "Lunch Select",
     )
     handle_exceptions(
-        lambda: meal_click(wait, report_dict.dinner_score, dinner_btn_ids),
-        "夕食ボタン",
+        lambda: meal_click(wait, daily_report.dinner_score, DINNER_BTN_IDS),
+        "Dinner Select",
     )
     handle_exceptions(
-        lambda: meal_click(wait, report_dict.breakfast_score, bf_btn_ids), "朝食ボタン"
+        lambda: meal_click(wait, daily_report.breakfast_score, BF_BTN_IDS),
+        "Breakfast Select",
     )
 
 

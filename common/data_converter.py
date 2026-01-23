@@ -98,7 +98,7 @@ class DailyReport(BaseModel):
             return float(v)
         except (ValueError, TypeError) as e:
             log_error("体温の値が正しくありません", e)
-            return ""
+            return None
 
     @field_validator("start_plan_time", "end_plan_time", mode="before")
     @classmethod
