@@ -118,15 +118,17 @@ def log_error(message, exception=None, level="ERROR"):
         "ERROR": "❌",
         "FATAL": "🚨",
     }
-
     icon = icons.get(level, "❌")
-
     formatted_message = f"{icon} {message}"
 
     if exception:
         logging.error(f"{formatted_message}: {exception}")
     else:
         logging.error(formatted_message)
+
+    # app_info.logへ概要を出力
+    short_message = f"{icon} エラーが発生しました： {message} (詳細はerror_info.logを参照してください)"
+    logging.info(short_message)
 
 
 def log_info(message):
