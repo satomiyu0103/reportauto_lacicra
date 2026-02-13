@@ -154,5 +154,5 @@ def convert_to_model(raw_data: list[Any]) -> DailyReport:
     ]
 
     report_dict = dict(zip(keys, raw_data))
-
+    # git test
     return DailyReport(**report_dict)
