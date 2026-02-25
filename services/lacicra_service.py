@@ -129,6 +129,11 @@ def login_lacicra(wait, your_username, your_password):
     )
 
 
+# button-1110-btnIconEl
+TODAY_REPORT_BTN_ID = "button-1130-btnIconEl"
+TODAY_REPORT_CLASS_NAME = "x-btn-icon-el"
+
+
 # ログイン後、今日の日報ボタンをクリック
 def today_report_click(wait, btn_id):
     today_report_button = wait.until(EC.element_to_be_clickable((By.ID, btn_id)))
@@ -137,7 +142,7 @@ def today_report_click(wait, btn_id):
 
 def today_report_btn_click(wait):
     # button-1110-btnIconEl
-    TODAY_REPORT_BTN_ID = "button-1111-btnIconEl"
+    TODAY_REPORT_BTN_ID = "button-1130-btnIconEl"
     handle_exceptions(
         lambda: today_report_click(wait, TODAY_REPORT_BTN_ID), TODAY_REPORT_BTN_ID
     )
@@ -258,16 +263,16 @@ def slp_status_click(wait, slp_status, btn_ids):
 
 # ID定義 (変更なし)
 WAKE_FEEL_BTN_IDS = {
-    1: "radiofield-1184-inputEl",
-    2: "radiofield-1185-inputEl",
-    3: "radiofield-1186-inputEl",
-    4: "radiofield-1187-inputEl",
+    1: "radiofield-1205-inputEl",
+    2: "radiofield-1206-inputEl",
+    3: "radiofield-1207-inputEl",
+    4: "radiofield-1208-inputEl",
 }
 WAKE_MOT_BTN_IDS = {
-    1: "radiofield-1190-inputEl",
-    2: "radiofield-1191-inputEl",
-    3: "radiofield-1192-inputEl",
-    4: "radiofield-1193-inputEl",
+    1: "radiofield-1211-inputEl",
+    2: "radiofield-1212-inputEl",
+    3: "radiofield-1213-inputEl",
+    4: "radiofield-1214-inputEl",
 }
 
 
@@ -287,9 +292,9 @@ def today_slp_status_click(wait: WebDriverWait, daily_report: DailyReport) -> No
 
 
 # ID定義 (変更なし)
-LUNCH_BTN_IDS = {1: "radiofield-1198-inputEl", 2: "radiofield-1199-inputEl"}
-DINNER_BTN_IDS = {1: "radiofield-1202-inputEl", 2: "radiofield-1203-inputEl"}
-BF_BTN_IDS = {1: "radiofield-1206-inputEl", 2: "radiofield-1207-inputEl"}
+LUNCH_BTN_IDS = {1: "radiofield-1219-inputEl", 2: "radiofield-1220-inputEl"}
+DINNER_BTN_IDS = {1: "radiofield-1223-inputEl", 2: "radiofield-1224-inputEl"}
+BF_BTN_IDS = {1: "radiofield-1227-inputEl", 2: "radiofield-1228-inputEl"}
 
 
 def meal_click(wait, meal, meal_btn_ids):
