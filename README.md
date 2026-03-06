@@ -45,8 +45,10 @@ GoogleスプレッドシートやGoogle Driveからデータを取得し、Selen
 
 ### 1. リポジトリのクローン
 
-git clone [https://github.com/satomiyu0103/reportauto_lacicra.git](https://github.com/satomiyu0103/reportauto_lacicra.git)
+```bash
+git clone https://github.com/satomiyu0103/reportauto_lacicra.git
 cd reportauto_lacicra
+```
 
 ### 2. uv のインストールと依存関係の同期
 
