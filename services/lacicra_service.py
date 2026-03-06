@@ -263,16 +263,16 @@ def slp_status_click(wait, slp_status, btn_ids):
 
 # ID定義 (変更なし)
 WAKE_FEEL_BTN_IDS = {
-    1: "radiofield-1204-inputEl",
-    2: "radiofield-1205-inputEl",
-    3: "radiofield-1206-inputEl",
-    4: "radiofield-1207-inputEl",
+    1: "radiofield-1203-inputEl",
+    2: "radiofield-1204-inputEl",
+    3: "radiofield-1205-inputEl",
+    4: "radiofield-1206-inputEl",
 }
 WAKE_MOT_BTN_IDS = {
-    1: "radiofield-1210-inputEl",
-    2: "radiofield-1211-inputEl",
-    3: "radiofield-1212-inputEl",
-    4: "radiofield-1213-inputEl",
+    1: "radiofield-1209-inputEl",
+    2: "radiofield-1210-inputEl",
+    3: "radiofield-1211-inputEl",
+    4: "radiofield-1212-inputEl",
 }
 
 
@@ -292,9 +292,9 @@ def today_slp_status_click(wait: WebDriverWait, daily_report: DailyReport) -> No
 
 
 # ID定義 (変更なし)
-LUNCH_BTN_IDS = {1: "radiofield-1218-inputEl", 2: "radiofield-1219-inputEl"}
-DINNER_BTN_IDS = {1: "radiofield-1222-inputEl", 2: "radiofield-1223-inputEl"}
-BF_BTN_IDS = {1: "radiofield-1226-inputEl", 2: "radiofield-1227-inputEl"}
+LUNCH_BTN_IDS = {1: "radiofield-1217-inputEl", 2: "radiofield-1218-inputEl"}
+DINNER_BTN_IDS = {1: "radiofield-1221-inputEl", 2: "radiofield-1222-inputEl"}
+BF_BTN_IDS = {1: "radiofield-1225-inputEl", 2: "radiofield-1226-inputEl"}
 
 
 def meal_click(wait, meal, meal_btn_ids):
