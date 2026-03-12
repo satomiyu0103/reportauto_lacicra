@@ -161,6 +161,11 @@ Selenium実行時に「SessionNotCreatedException」が発生する場合、Chro
 `gspread.exceptions.AlreadClosedContext` や認証エラーが出る場合。
 - 対策: `config/service_account.json` が正しいか、およびスプレッドシートがサービスアカウントのメールアドレスに共有されているか確認してください。
 
+### 3. 睡眠 / 食事の選択エラー
+正しい選択肢が選ばれない、もしくは選択がされない場合。
+- 対策: lacicra_service.py内のradioボタンのIDが間違っていないか確認してください。
+- 確認方法: 今日の日報ページの該当部分を右クリックし、「検証」をクリック。該当idのナンバーを確認する。
+
 ## 📄 ライセンス
 
 このプロジェクトは個人利用を目的としています。商用利用や再配布の際は、対象サイト（Lacicra）の利用規約を遵守してください。
