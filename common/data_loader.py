@@ -100,7 +100,8 @@ def _load_from_gspread():
     try:
         worksheet = workbook.worksheet(SHEET_NAME)
     except gspread.WorksheetNotFound:
-        worksheet = worksheet.get_worksheet(0)
+        worksheet = workbook.get_worksheet(0)
+        log_error("ワークシートが存在しません")
 
     # 全データを文字列リストとして取得(get_all_values)
     raw_data = worksheet.get_all_values()
