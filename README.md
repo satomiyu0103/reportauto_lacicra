@@ -135,6 +135,18 @@ uv run ruff check --fix
 インデントや改行位置を統一します（Black互換）。
 uv run ruff format .
 
+#### 4. テスト実行 (Pytest)
+
+回帰がないか確認します。
+uv run pytest -q
+
+#### 推奨実行順
+
+静的解析とテストをまとめて実行する場合は、次の順番を推奨します。
+1. uv run ruff check
+2. uv run ruff format .
+3. uv run pytest -q
+
 ### 💡 VS Code 推奨設定
 
 VS Code拡張機能 Ruff をインストールすると、ファイル保存時に自動で整形と修正が行われ、開発効率が向上します。
