@@ -10,7 +10,11 @@ import requests
 
 from common.data_converter import DailyReport
 from common.log_handler import log_error, log_info
-from config.settings import SLACK_WEBHOOK_URL_TOME, SLACK_WEBHOOK_URL_TOSTUFF
+from config.settings import (
+    SLACK_WEBHOOK_URL_ERROR,
+    SLACK_WEBHOOK_URL_TOME,
+    SLACK_WEBHOOK_URL_TOSTUFF,
+)
 
 URGENCY_LABELS = {
     "WARN": "⚠️ 低（警告）",
@@ -47,9 +51,9 @@ def send_error_alert(
     status: str = "異常終了",
     exception: Exception | None = None,
 ) -> None:
-    """エラー発生時に SLACK_WEBHOOK_URL_TOME へ通知する"""
-    if not SLACK_WEBHOOK_URL_TOME:
-        log_error("Slack Webhook URL (TOME) が設定されていません")
+    """エラー発生時に SLACK_WEBHOOK_URL_ERROR へ通知する"""
+    if not SLACK_WEBHOOK_URL_ERROR:
+        log_error("Slack Webhook URL (ERROR) が設定されていません")
         return
 
     jst = timezone(timedelta(hours=9), "JST")
@@ -65,7 +69,7 @@ def send_error_alert(
 ■ 詳細: {detail}
 ■ 発生日時: {now} (JST)
 """
-    _send_slack(msg, SLACK_WEBHOOK_URL_TOME)
+    _send_slack(msg, SLACK_WEBHOOK_URL_ERROR)
 
 
 def create_morning_message(data: DailyReport) -> str:
