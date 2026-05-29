@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
+from common.data_normalizer import normalize_report_dict
 from common.log_handler import log_error
 
 
@@ -154,5 +155,5 @@ def convert_to_model(raw_data: list[Any]) -> DailyReport:
     ]
 
     report_dict = dict(zip(keys, raw_data))
-    # git test
+    report_dict = normalize_report_dict(report_dict)
     return DailyReport(**report_dict)
