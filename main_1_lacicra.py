@@ -30,6 +30,7 @@ from config.settings import (
 
 # Lacicra操作
 from services.lacicra_service import (
+    BrowserClosedError,
     input_today_summarys,
     login_lacicra,
     open_lacicra,
@@ -44,6 +45,8 @@ PROGRAM_NAME = "main_1_lacicra"
 
 
 def main():
+    automation_done = False
+
     try:
         log_info("🚀 Lacicra処理を開始します")
 
@@ -106,12 +109,37 @@ def main():
         today_slp_status_click(wait, report_data)
         today_meal_click(wait, report_data)
 
-        log_info("💾 本日の報告を保存します")
+        log_info("💾 本日の報告を一時保存します")
         save_button_click(wait)
 
-        log_info("✅ Lacicra処理が正常終了しました")
+        automation_done = True
+        log_info("✅ 一時保存が完了しました。内容を確認して提出してください。")
+        log_info("ブラウザは開いたままです。確認後、手動で提出・閉じてください。")
+
+    except BrowserClosedError as e:
+        if automation_done:
+            log_info("一時保存後にブラウザが閉じられました。")
+            return
+
+        log_error("自動操作中にブラウザが閉じられました", e, level="WARN")
+        send_error_alert(
+            PROGRAM_NAME,
+            "自動操作中にブラウザが閉じられました。再実行してください。",
+            urgency="WARN",
+            status="中断",
+            exception=e,
+        )
+        log_info("⛔ プログラムを中断します")
+        logging.shutdown()
+        sys.exit(1)
 
     except Exception as e:
+        if automation_done:
+            log_info(
+                "一時保存は完了しています。ブラウザ上で内容を確認してください。"
+            )
+            return
+
         log_error("実行中に予期せぬエラーが発生しました", e, level="FATAL")
         send_error_alert(
             PROGRAM_NAME,
@@ -122,7 +150,6 @@ def main():
         )
         log_info("⛔ プログラムを異常終了します")
         logging.shutdown()
-        # error時はウィンドウを閉じずに確認
         sys.exit(1)
 
 

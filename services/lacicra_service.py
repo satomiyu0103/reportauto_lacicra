@@ -28,6 +28,27 @@ from common.data_converter import DailyReport
 from common.log_handler import log_error, log_info
 
 
+class BrowserClosedError(Exception):
+    """操作中にブラウザウィンドウが閉じられた"""
+
+
+def _is_browser_closed(exc: Exception) -> bool:
+    if isinstance(exc, (NoSuchWindowException, InvalidSessionIdException)):
+        return True
+    if isinstance(exc, WebDriverException):
+        msg = str(exc).lower()
+        return any(
+            phrase in msg
+            for phrase in (
+                "no such window",
+                "target window already closed",
+                "web view not found",
+                "invalid session id",
+            )
+        )
+    return False
+
+
 def handle_exceptions(action: Callable[[], Any], element_id: str) -> None:
     """
     指定されたアクションを実行し、発生した例外に応じて適切なレベルでログを記録する。
@@ -53,30 +74,34 @@ def handle_exceptions(action: Callable[[], Any], element_id: str) -> None:
             f"'{element_id}'が古くなっています(Stale)。再取得が必要です", level="ERROR"
         )
 
-    # --- [🚨 FATAL] システム・ブラウザ自体のクラッシュ (即時停止) ---
+    # --- [⚠️ WARN] ブラウザが手動で閉じられた (処理中断) ---
     except NoSuchWindowException as e:
         log_error(
-            f"[致命] 対象のウィンドウが見つかりません（手動で閉じられた可能性があります）。処理を中断します: {e}",
-            level="FATAL",
+            f"'{element_id}'の操作中にブラウザが閉じられました: {e}",
+            level="WARN",
         )
-        log_info("🚨 処理を中断します。")
-        raise  # 停止
+        raise BrowserClosedError("ブラウザウィンドウが閉じられました") from e
 
     except InvalidSessionIdException as e:
         log_error(
-            f"[致命] ブラウザセッションが終了しました。処理を中断します: {e}",
-            level="FATAL",
+            f"'{element_id}'の操作中にブラウザセッションが終了しました: {e}",
+            level="WARN",
         )
-        log_info("🚨 処理を中断します。")
-        raise  # 停止
+        raise BrowserClosedError("ブラウザウィンドウが閉じられました") from e
 
     except WebDriverException as e:
+        if _is_browser_closed(e):
+            log_error(
+                f"'{element_id}'の操作中にブラウザが閉じられました: {e}",
+                level="WARN",
+            )
+            raise BrowserClosedError("ブラウザウィンドウが閉じられました") from e
         log_error(
             f"[致命] WebDriverのエラーです。Chromeのバージョン等を確認してください: {e}",
             level="FATAL",
         )
         log_info("🚨 処理を中断します。")
-        raise  # 停止
+        raise
 
     # --- [❌ ERROR] その他予期せぬエラー ---
     except Exception as e:
