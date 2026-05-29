@@ -3,6 +3,7 @@
 =========="""
 
 import json
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import requests
@@ -10,6 +11,12 @@ import requests
 from common.data_converter import DailyReport
 from common.log_handler import log_error, log_info
 from config.settings import SLACK_WEBHOOK_URL_TOME, SLACK_WEBHOOK_URL_TOSTUFF
+
+URGENCY_LABELS = {
+    "WARN": "⚠️ 低（警告）",
+    "ERROR": "❌ 中（エラー）",
+    "FATAL": "🚨 高（致命的）",
+}
 
 
 def _send_slack(message: str, webhook_url: str | None) -> Any:
@@ -31,6 +38,34 @@ def _send_slack(message: str, webhook_url: str | None) -> Any:
             log_error(f"Slack送信失敗: {response.status_code} - {response.text}")
     except Exception as e:
         log_error("Slack送信中にエラーが発生", e)
+
+
+def send_error_alert(
+    program_name: str,
+    message: str,
+    urgency: str = "ERROR",
+    status: str = "異常終了",
+    exception: Exception | None = None,
+) -> None:
+    """エラー発生時に SLACK_WEBHOOK_URL_TOME へ通知する"""
+    if not SLACK_WEBHOOK_URL_TOME:
+        log_error("Slack Webhook URL (TOME) が設定されていません")
+        return
+
+    jst = timezone(timedelta(hours=9), "JST")
+    now = datetime.now(jst).strftime("%Y-%m-%d %H:%M:%S")
+    urgency_display = URGENCY_LABELS.get(urgency, urgency)
+    detail = str(exception) if exception else "なし"
+
+    msg = f"""🚨 【RPAエラー通知】
+■ プログラム: {program_name}
+■ 緊急度: {urgency_display}
+■ 実行状況: {status}
+■ 内容: {message}
+■ 詳細: {detail}
+■ 発生日時: {now} (JST)
+"""
+    _send_slack(msg, SLACK_WEBHOOK_URL_TOME)
 
 
 def create_morning_message(data: DailyReport) -> str:

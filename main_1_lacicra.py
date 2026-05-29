@@ -38,6 +38,9 @@ from services.lacicra_service import (
     today_report_btn_click,
     today_slp_status_click,
 )
+from services.slack_service import send_error_alert
+
+PROGRAM_NAME = "main_1_lacicra"
 
 
 def main():
@@ -49,6 +52,7 @@ def main():
         data_list = load_data(EXCEL_FILE_PATH)
         if not data_list:
             log_error("データが空です")
+            send_error_alert(PROGRAM_NAME, "データが空です", status="異常終了")
             return
 
         # 今日のデータ行を検索
@@ -108,7 +112,14 @@ def main():
         log_info("✅ Lacicra処理が正常終了しました")
 
     except Exception as e:
-        log_error("実行中に予期せぬエラーが発生しました", e)
+        log_error("実行中に予期せぬエラーが発生しました", e, level="FATAL")
+        send_error_alert(
+            PROGRAM_NAME,
+            "実行中に予期せぬエラーが発生しました",
+            urgency="FATAL",
+            status="異常終了",
+            exception=e,
+        )
         log_info("⛔ プログラムを異常終了します")
         logging.shutdown()
         # error時はウィンドウを閉じずに確認

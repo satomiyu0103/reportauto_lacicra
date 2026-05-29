@@ -9,7 +9,9 @@ from common.data_converter import convert_to_model
 from common.data_loader import find_today_row, load_data
 from common.log_handler import log_error, log_info
 from config.settings import EXCEL_FILE_PATH
-from services.slack_service import send_report
+from services.slack_service import send_error_alert, send_report
+
+PROGRAM_NAME = "main_2_morning_post"
 
 
 def main():
@@ -21,7 +23,11 @@ def main():
         today_row = find_today_row(data_rows, date.today())
 
         if not today_row:
-            log_error("本日のデータが見つからないため、朝の報告をスキップします")
+            message = "本日のデータが見つからないため、朝の報告をスキップします"
+            log_error(message, level="WARN")
+            send_error_alert(
+                PROGRAM_NAME, message, urgency="WARN", status="処理スキップ"
+            )
             return
 
         report_data = convert_to_model(today_row)
@@ -41,7 +47,14 @@ def main():
         # send_report(report_data, report_type="morning", to_staff=False)
 
     except Exception as e:
-        log_error("朝の報告処理でエラーが発生しました", e)
+        log_error("朝の報告処理でエラーが発生しました", e, level="FATAL")
+        send_error_alert(
+            PROGRAM_NAME,
+            "朝の報告処理でエラーが発生しました",
+            urgency="FATAL",
+            status="異常終了",
+            exception=e,
+        )
         logging.shutdown()
 
 
