@@ -135,9 +135,7 @@ def main():
 
     except Exception as e:
         if automation_done:
-            log_info(
-                "一時保存は完了しています。ブラウザ上で内容を確認してください。"
-            )
+            log_info("一時保存は完了しています。ブラウザ上で内容を確認してください。")
             return
 
         log_error("実行中に予期せぬエラーが発生しました", e, level="FATAL")
