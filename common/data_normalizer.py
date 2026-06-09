@@ -1,5 +1,7 @@
 """==========
+
 ■ 読み取りデータの自動補正
+
 =========="""
 
 import re
@@ -18,6 +20,7 @@ TIME_FIELDS = {
     "終了時間",
 }
 
+
 INTEGER_FIELDS = {
     "寝覚め",
     "やる気",
@@ -27,9 +30,12 @@ INTEGER_FIELDS = {
     "朝食",
 }
 
+
 FLOAT_FIELDS = {"体温", "体重", "腹囲"}
 
+
 PERCENT_FIELDS = {"わんこ", "一極", "耳目確認", "命名規則"}
+
 
 TEXT_FIELDS = {
     "体調",
@@ -47,7 +53,9 @@ TEXT_FIELDS = {
     "活動報告",
 }
 
+
 # 利用形態の表記ゆれ（よくある入力ミス）
+
 USAGE_TYPE_ALIASES = {
     "在宅勤務": "在宅",
     "在宅　": "在宅",
@@ -55,155 +63,218 @@ USAGE_TYPE_ALIASES = {
 }
 
 
-def to_halfwidth(value: str) -> str:
+def convert_fullwidth_to_halfwidth(raw_text: str) -> str:
     """全角英数字・記号を半角に変換する"""
-    return unicodedata.normalize("NFKC", value)
+
+    return unicodedata.normalize("NFKC", raw_text)
 
 
-def normalize_whitespace(value: str) -> str:
-    """前後・連続空白（全角スペース含む）を正規化する"""
-    return " ".join(value.replace("\u3000", " ").split())
+def collapse_inline_spaces_keep_newlines(raw_text: str) -> str:
+    """行内の連続空白を1つにまとめ、改行はそのまま残す"""
+
+    text_lines = raw_text.replace("\u3000", " ").splitlines()
+
+    return "\n".join(" ".join(line.split()) for line in text_lines)
 
 
-def _is_empty(value: Any) -> bool:
-    return value is None or value == ""
+def _is_blank_value(field_value: Any) -> bool:
+    return field_value is None or field_value == ""
 
 
-def normalize_text(value: Any) -> Any:
+def normalize_text(raw_field_value: Any) -> Any:
     """テキスト項目の空白・全角を正規化する"""
-    if _is_empty(value):
-        return value
-    if not isinstance(value, str):
-        return value
 
-    normalized = normalize_whitespace(to_halfwidth(value))
-    return USAGE_TYPE_ALIASES.get(normalized, normalized)
+    if _is_blank_value(raw_field_value):
+        return raw_field_value
+
+    if not isinstance(raw_field_value, str):
+        return raw_field_value
+
+    normalized_text = collapse_inline_spaces_keep_newlines(
+        convert_fullwidth_to_halfwidth(raw_field_value)
+    )
+
+    return USAGE_TYPE_ALIASES.get(normalized_text, normalized_text)
 
 
-def normalize_time(value: Any) -> Any:
+def normalize_time(raw_field_value: Any) -> Any:
     """時刻項目を HH:MM 形式に揃える"""
-    if _is_empty(value):
-        return value
-    if isinstance(value, datetime):
-        return value.strftime("%H:%M")
-    if isinstance(value, time):
-        return value.strftime("%H:%M")
 
-    text = normalize_whitespace(to_halfwidth(str(value)))
+    if _is_blank_value(raw_field_value):
+        return raw_field_value
 
-    match = re.fullmatch(r"(\d{1,2})[時:：](\d{1,2})分?", text)
-    if match:
-        hour, minute = int(match.group(1)), int(match.group(2))
+    if isinstance(raw_field_value, datetime):
+        return raw_field_value.strftime("%H:%M")
+
+    if isinstance(raw_field_value, time):
+        return raw_field_value.strftime("%H:%M")
+
+    time_text = collapse_inline_spaces_keep_newlines(
+        convert_fullwidth_to_halfwidth(str(raw_field_value))
+    )
+
+    japanese_time_match = re.fullmatch(r"(\d{1,2})[時:：](\d{1,2})分?", time_text)
+
+    if japanese_time_match:
+        hour, minute = (
+            int(japanese_time_match.group(1)),
+            int(japanese_time_match.group(2)),
+        )
+
         if 0 <= hour <= 23 and 0 <= minute <= 59:
             return f"{hour:02d}:{minute:02d}"
 
-    match = re.fullmatch(r"(\d{1,2})[:：](\d{2})", text)
-    if match:
-        hour, minute = int(match.group(1)), int(match.group(2))
+    colon_separated_match = re.fullmatch(r"(\d{1,2})[:：](\d{2})", time_text)
+
+    if colon_separated_match:
+        hour, minute = (
+            int(colon_separated_match.group(1)),
+            int(colon_separated_match.group(2)),
+        )
+
         if 0 <= hour <= 23 and 0 <= minute <= 59:
             return f"{hour:02d}:{minute:02d}"
 
-    match = re.fullmatch(r"\d{3,4}", text)
-    if match:
-        digits = text.zfill(4)
-        hour, minute = int(digits[:2]), int(digits[2:])
+    compact_digits_match = re.fullmatch(r"\d{3,4}", time_text)
+
+    if compact_digits_match:
+        four_digit_time = time_text.zfill(4)
+
+        hour, minute = int(four_digit_time[:2]), int(four_digit_time[2:])
+
         if 0 <= hour <= 23 and 0 <= minute <= 59:
             return f"{hour:02d}:{minute:02d}"
 
-    return text
+    return time_text
 
 
-def _strip_numeric_suffix(value: str) -> str:
+def _remove_unit_suffix_from_number(number_with_unit: str) -> str:
     """数値末尾の単位・記号を除去する"""
-    value = re.sub(r"[度℃％%個歩分点]+(?:[以上以下]?)?$", "", value)
-    value = re.sub(r"(?i)(kg|g|km|m|cm|mm)$", "", value)
-    return value
+
+    number_with_unit = re.sub(
+        r"[度℃％%個歩分点]+(?:[以上以下]?)?$", "", number_with_unit
+    )
+
+    number_with_unit = re.sub(r"(?i)(kg|g|km|m|cm|mm)$", "", number_with_unit)
+
+    return number_with_unit
 
 
-def _extract_numeric_text(value: str) -> str:
+def _extract_leading_number_string(number_with_unit: str) -> str:
     """先頭の数値部分を取り出す（単位付き入力向け）"""
-    value = _strip_numeric_suffix(value)
-    match = re.match(r"^[+-]?\d+(?:\.\d+)?", value)
-    if match:
-        return match.group(0)
-    return value
+
+    number_without_suffix = _remove_unit_suffix_from_number(number_with_unit)
+
+    leading_number_match = re.match(r"^[+-]?\d+(?:\.\d+)?", number_without_suffix)
+
+    if leading_number_match:
+        return leading_number_match.group(0)
+
+    return number_without_suffix
 
 
-def normalize_number(value: Any) -> Any:
+def normalize_number(raw_field_value: Any) -> Any:
     """数値項目の全角・単位付き表記を数値文字列に揃える"""
-    if _is_empty(value):
-        return value
-    if isinstance(value, (int, float)):
-        return value
 
-    text = normalize_whitespace(to_halfwidth(str(value)))
-    text = text.replace(",", "").replace("，", "")
-    text = text.replace("、", "")
-    text = _extract_numeric_text(text)
-    return text
+    if _is_blank_value(raw_field_value):
+        return raw_field_value
+
+    if isinstance(raw_field_value, (int, float)):
+        return raw_field_value
+
+    numeric_text = collapse_inline_spaces_keep_newlines(
+        convert_fullwidth_to_halfwidth(str(raw_field_value))
+    )
+
+    numeric_text = numeric_text.replace(",", "").replace("，", "")
+
+    numeric_text = numeric_text.replace("、", "")
+
+    numeric_text = _extract_leading_number_string(numeric_text)
+
+    return numeric_text
 
 
-def normalize_integer(value: Any) -> Any:
+def normalize_integer(raw_field_value: Any) -> Any:
     """整数項目を正規化する（小数表記は四捨五入）"""
-    if _is_empty(value):
-        return value
-    if isinstance(value, int):
-        return value
 
-    text = normalize_number(value)
-    if text == "":
-        return value
+    if _is_blank_value(raw_field_value):
+        return raw_field_value
+
+    if isinstance(raw_field_value, int):
+        return raw_field_value
+
+    numeric_text = normalize_number(raw_field_value)
+
+    if numeric_text == "":
+        return raw_field_value
 
     try:
-        return int(round(float(text)))
+        return int(round(float(numeric_text)))
+
     except (ValueError, TypeError):
-        return value
+        return raw_field_value
 
 
-def normalize_percent(value: Any) -> Any:
+def normalize_percent(raw_field_value: Any) -> Any:
     """パーセント表記を数値文字列に揃える"""
-    if _is_empty(value):
-        return value
-    if isinstance(value, (int, float)):
-        return str(int(round(float(value))))
 
-    text = normalize_number(value)
-    if text == "":
-        return value
+    if _is_blank_value(raw_field_value):
+        return raw_field_value
+
+    if isinstance(raw_field_value, (int, float)):
+        return str(int(round(float(raw_field_value))))
+
+    numeric_text = normalize_number(raw_field_value)
+
+    if numeric_text == "":
+        return raw_field_value
 
     try:
-        return str(int(round(float(text))))
+        return str(int(round(float(numeric_text))))
+
     except (ValueError, TypeError):
-        return value
+        return raw_field_value
 
 
-def normalize_report_dict(report_dict: dict[str, Any]) -> dict[str, Any]:
+def normalize_report_dict(raw_report_row: dict[str, Any]) -> dict[str, Any]:
     """日報1行分の辞書を自動補正する"""
-    normalized = dict(report_dict)
 
-    for key, value in report_dict.items():
-        if key == "日付" or _is_empty(value):
+    corrected_report_row = dict(raw_report_row)
+
+    for field_name, raw_field_value in raw_report_row.items():
+        if field_name == "日付" or _is_blank_value(raw_field_value):
             continue
 
-        if key in TIME_FIELDS:
-            new_value = normalize_time(value)
-        elif key in INTEGER_FIELDS:
-            new_value = normalize_integer(value)
-        elif key in FLOAT_FIELDS:
-            new_value = normalize_number(value)
-        elif key in PERCENT_FIELDS:
-            new_value = normalize_percent(value)
-        elif key == "自習時間":
-            new_value = normalize_integer(value)
-            if isinstance(new_value, int):
-                new_value = str(new_value)
-        elif key in TEXT_FIELDS:
-            new_value = normalize_text(value)
+        if field_name in TIME_FIELDS:
+            corrected_field_value = normalize_time(raw_field_value)
+
+        elif field_name in INTEGER_FIELDS:
+            corrected_field_value = normalize_integer(raw_field_value)
+
+        elif field_name in FLOAT_FIELDS:
+            corrected_field_value = normalize_number(raw_field_value)
+
+        elif field_name in PERCENT_FIELDS:
+            corrected_field_value = normalize_percent(raw_field_value)
+
+        elif field_name == "自習時間":
+            corrected_field_value = normalize_integer(raw_field_value)
+
+            if isinstance(corrected_field_value, int):
+                corrected_field_value = str(corrected_field_value)
+
+        elif field_name in TEXT_FIELDS:
+            corrected_field_value = normalize_text(raw_field_value)
+
         else:
             continue
 
-        if new_value != value:
-            log_info(f"📝 [Data Fix] {key}: {value!r} → {new_value!r}")
-            normalized[key] = new_value
+        if corrected_field_value != raw_field_value:
+            log_info(
+                f"📝 [Data Fix] {field_name}: {raw_field_value!r} → {corrected_field_value!r}"
+            )
 
-    return normalized
+            corrected_report_row[field_name] = corrected_field_value
+
+    return corrected_report_row
